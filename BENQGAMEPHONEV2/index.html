@@ -620,7 +620,7 @@
 
                     {/* Right: Character Area */}
                     <div className="w-5/12 relative bg-gradient-to-b from-white to-slate-100 flex justify-center items-end pb-8">
-                         <WorkerFigure className="scale-[0.35] sm:scale-75 translate-y-4" />
+                         <WorkerFigure className="scale-[0.28] sm:scale-60 translate-y-2" />
                     </div>
                 </div>
 
@@ -639,7 +639,7 @@
                                         key={group.id} 
                                         onClick={() => setActiveGroupId(group.id)}
                                         disabled={gameState !== 'playing'}
-                                        className={`relative flex flex-col items-center justify-center py-2 rounded-lg transition-all active:scale-95
+                                        className={`relative flex flex-col items-center justify-center py-1.5 rounded-lg transition-all active:scale-95
                                         ${isActive ? 'bg-benq text-white shadow-md' : 'bg-slate-50 text-slate-500 hover:bg-slate-100'}`}
                                     >
                                         {count > 0 && (
@@ -647,8 +647,8 @@
                                                 {count}
                                             </span>
                                         )}
-                                        <Icon size={12} />
-                                        <span className="text-[10px] font-bold mt-0.5">{group.name}</span>
+                                        <Icon size={10} />
+                                        <span className="text-[10px] font-bold mt-0">{group.name}</span>
                                     </button>
                                 )
                             })}
@@ -665,12 +665,12 @@
                                     const Icon = item.Component;
                                     return (
                                         <button key={item.id} onClick={() => toggleItem(item)} disabled={gameState !== 'playing'}
-                                            className={`relative flex flex-col items-center p-2 rounded-xl border-2 transition-all active:scale-95 h-20 justify-between
+                                            className={`relative flex flex-col items-center p-1.5 rounded-xl border-2 transition-all active:scale-95 h-18 justify-between
                                             ${isWorn ? 'bg-purple-50 border-benq shadow-md' : 'bg-white border-slate-200'}`}
                                         >
                                             {isWorn && <div className="absolute top-1 right-1 text-benq"><CheckCircle size={14}/></div>}
-                                            <div className="w-6 h-6 flex items-center justify-center mt-1"><Icon /></div>
-                                            <div className="text-xs font-bold text-slate-600 text-center leading-tight w-full line-clamp-2">{item.name}</div>
+                                            <div className="w-5 h-5 flex items-center justify-center mt-0.5"><Icon /></div>
+                                            <div className="text-[10px] font-bold text-slate-600 text-center leading-tight w-full line-clamp-2 mt-0.5">{item.name}</div>
                                         </button>
                                     )
                                 })}
