@@ -476,11 +476,11 @@
                   <div className="flex gap-1 -mt-4 z-10">
                     <div className="w-16 h-32 bg-slate-800 rounded-b-lg border-2 border-slate-900 relative flex justify-center shadow-lg">
                         {bodyFull && <div className="absolute inset-0 bg-white rounded-b-lg opacity-90"></div>}
-                       {feet ? <div className={`absolute -bottom-2 w-18 h-12 ${feet.color} rounded-lg border-b-4 border-black z-20`}></div> : <div className="absolute -bottom-2 w-18 h-10 bg-black rounded-lg z-20"></div>}
+                       {feet ? <div className={`absolute -bottom-2 w-20 h-12 left-1/2 -translate-x-1/2 ${feet.color} rounded-lg border-b-4 border-black z-20`}></div> : <div className="absolute -bottom-2 w-18 h-10 bg-black rounded-lg z-20"></div>}
                     </div>
                     <div className="w-16 h-32 bg-slate-800 rounded-b-lg border-2 border-slate-900 relative flex justify-center shadow-lg">
                         {bodyFull && <div className="absolute inset-0 bg-white rounded-b-lg opacity-90"></div>}
-                       {feet ? <div className={`absolute -bottom-2 w-18 h-12 ${feet.color} rounded-lg border-b-4 border-black z-20`}></div> : <div className="absolute -bottom-2 w-18 h-10 bg-black rounded-lg z-20"></div>}
+                       {feet ? <div className={`absolute -bottom-2 w-20 h-12 left-1/2 -translate-x-1/2 ${feet.color} rounded-lg border-b-4 border-black z-20`}></div> : <div className="absolute -bottom-2 w-18 h-10 bg-black rounded-lg z-20"></div>}
                     </div>
                   </div>
                 </div>
@@ -593,8 +593,8 @@
 
                 {/* 2. Top Section: Question & Lion (Fixed Height Split View) */}
                 <div className="flex w-full h-[35vh] border-b border-slate-200 shrink-0 bg-white">
-                    {/* Left: Question Area */}
-                    <div className="w-7/12 p-3 flex flex-col justify-center border-r border-slate-100 bg-slate-50">
+                    {/* Left: Question Area (Expanded to 2/3 width) */}
+                    <div className="w-2/3 p-4 flex flex-col border-r border-slate-100 bg-slate-50">
                          {/* Title */}
                          <h1 className="font-bold text-slate-800 text-lg leading-tight mb-2">{currentScenario?.title}</h1>
                          
@@ -618,9 +618,9 @@
                          <p className="text-base text-slate-600 leading-snug overflow-y-auto max-h-[150px] mb-2">{currentScenario?.description}</p>
                     </div>
 
-                    {/* Right: Character Area */}
-                    <div className="w-5/12 relative bg-gradient-to-b from-white to-slate-100 flex justify-center items-end pb-8">
-                         <WorkerFigure className="scale-[0.28] sm:scale-60 translate-y-2" />
+                    {/* Right: Character Area (Narrower 1/3 width) */}
+                    <div className="w-1/3 relative bg-gradient-to-b from-white to-slate-100 flex justify-center items-end pb-8 overflow-hidden">
+                         <WorkerFigure className="scale-[0.28] sm:scale-60 translate-y-4" />
                     </div>
                 </div>
 
