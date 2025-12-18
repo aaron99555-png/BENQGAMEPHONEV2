@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
@@ -41,19 +41,14 @@
         
         /* Animation utilities */
         .animate-fade-in { animation: fadeIn 0.3s ease-out; }
-        .animate-pop-up { animation: popUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
         .animate-slide-up { animation: slideUp 0.3s ease-out; }
 
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
         }
-        @keyframes popUp {
-            from { opacity: 0; transform: scale(0.9) translateY(20px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
-        }
         @keyframes slideUp {
-            from { opacity: 0; transform: translateY(100%); }
+            from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
     </style>
@@ -83,6 +78,27 @@
                                     dark: '#4a1d6e',
                                 },
                             },
+                            animation: {
+                                'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                                'shake': 'shake 0.5s ease-in-out',
+                                'fade-in': 'fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+                                'slide-up': 'slideUp 0.5s ease-out',
+                            },
+                            keyframes: {
+                                shake: {
+                                    '0%, 100%': { transform: 'translateX(0)' },
+                                    '25%': { transform: 'translateX(-5px)' },
+                                    '75%': { transform: 'translateX(5px)' },
+                                },
+                                fadeIn: {
+                                    'from': { opacity: '0', transform: 'translateY(10px)' },
+                                    'to': { opacity: '1', transform: 'translateY(0)' },
+                                },
+                                slideUp: {
+                                    'from': { opacity: '0', transform: 'translateY(20px)' },
+                                    'to': { opacity: '1', transform: 'translateY(0)' },
+                                }
+                            }
                         }
                     }
                 }
@@ -112,7 +128,7 @@
         const History = (p) => <IconBase {...p}><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path><path d="M12 7v5l4 2"></path></IconBase>;
         const Building2 = (p) => <IconBase {...p}><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"></path><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"></path><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"></path><path d="M10 6h4"></path><path d="M10 10h4"></path><path d="M10 14h4"></path><path d="M10 18h4"></path></IconBase>;
         const UserCheck = (p) => <IconBase {...p}><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><polyline points="16 11 18 13 22 9"></polyline></IconBase>;
-        const Upload = (p) => <IconBase {...p}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></IconBase>;
+        const Upload = (p) => <IconBase {...p}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></IconBase>;
         const Trophy = (p) => <IconBase {...p}><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M9 14.66V17a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-2.34l-3.14-3.14a3 3 0 0 1-.72-1.54l-.52-2.28"></path><path d="M19.42 4.94A2 2 0 0 0 18 4H6a2 2 0 0 0-1.42.94L2 9.07a2.12 2.12 0 0 0 .59 2.14l8.28 7.37a2 2 0 0 0 2.26 0l8.28-7.37a2.12 2.12 0 0 0 .59-2.14z"></path></IconBase>;
         const X = (p) => <IconBase {...p}><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></IconBase>;
         const Info = (p) => <IconBase {...p}><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></IconBase>;
@@ -217,8 +233,8 @@
           const [employeeId, setEmployeeId] = useState('');
           const [isBlinking, setIsBlinking] = useState(false);
 
-          // NEW: State for Popup Modal
-          const [openGroupId, setOpenGroupId] = useState(null);
+          // NEW: State for Active Group Tab (Default to the first one)
+          const [activeGroupId, setActiveGroupId] = useState(CATEGORY_GROUPS[0].id);
 
           const formatTime = (ms) => (ms / 1000).toFixed(2);
 
@@ -247,7 +263,7 @@
             setRound(1);
             setUsedScenarioIds([]);
             pickNextLevel([]);
-            setOpenGroupId(null);
+            setActiveGroupId(CATEGORY_GROUPS[0].id);
           };
 
           const pickNextLevel = (currentUsedIds) => {
@@ -267,7 +283,8 @@
             setFailDetails(null);
             setHintVisible(false);
             setIsActive(true); 
-            setOpenGroupId(null);
+            // Optional: reset to first group or keep current
+            setActiveGroupId(CATEGORY_GROUPS[0].id);
           };
 
           const nextRound = () => {
@@ -564,7 +581,7 @@
 
           // --- 手機版主要佈局 ---
           return (
-            <div className="h-full flex flex-col overflow-hidden bg-slate-50 relative">
+            <div className="h-full flex flex-col overflow-hidden bg-slate-50">
                 {/* 1. Header (固定) */}
                 <div className="flex-none bg-white shadow-sm z-20 flex justify-between items-center px-4 py-2 border-b border-slate-100">
                      <div className="flex items-center gap-2">
@@ -574,69 +591,91 @@
                      <div className="font-black text-benq text-lg">{score}</div>
                 </div>
 
-                {/* 2. Main Content (Expanded Character + Question) */}
-                <div className="flex-1 flex flex-col relative overflow-hidden bg-white">
-                    {/* Question Bubble Area */}
-                    <div className="flex-none p-4 z-10 bg-gradient-to-b from-white to-transparent">
-                        <div className="flex flex-col gap-2">
-                             <div className="flex justify-between items-start">
-                                 <h1 className="font-bold text-slate-800 text-xl leading-tight">{currentScenario?.title}</h1>
-                                 {/* Item Count Hint */}
-                                 {currentScenario && (
-                                    <div className="flex items-center gap-1 text-xs font-bold text-slate-500 bg-slate-100 px-2 py-1 rounded-lg whitespace-nowrap">
-                                        <Info size={12} className="text-benq"/>
-                                        <span>需選 <span className="text-benq text-sm mx-0.5">{currentScenario.required.length}</span> 項</span>
-                                    </div>
-                                 )}
-                             </div>
-                             
-                             <p className="text-base text-slate-600 leading-snug">{currentScenario?.description}</p>
-                             
+                {/* 2. Top Section: Question & Lion (Fixed Height Split View) */}
+                <div className="flex w-full h-[35vh] border-b border-slate-200 shrink-0 bg-white">
+                    {/* Left: Question Area */}
+                    <div className="w-7/12 p-3 flex flex-col justify-center border-r border-slate-100 bg-slate-50">
+                         {/* Title & Hint Row */}
+                         <div className="flex flex-col gap-2 mb-2">
+                             <h1 className="font-bold text-slate-800 text-2xl leading-tight">{currentScenario?.title}</h1>
                              {!hintVisible ? (
                                 <button onClick={showHint} className="self-start flex items-center gap-1 text-xs font-bold text-amber-600 bg-amber-100 px-3 py-1.5 rounded-full border border-amber-200 active:scale-95 whitespace-nowrap"><Lightbulb size={12}/> 提示</button>
                             ) : (
                                 <div className="self-start text-xs font-bold text-amber-600 bg-amber-50 px-3 py-1.5 rounded border border-amber-100 animate-fade-in">{currentScenario?.hint}</div>
                             )}
-                        </div>
+                         </div>
+                         <p className="text-lg text-slate-600 leading-snug overflow-y-auto max-h-[150px] mb-2">{currentScenario?.description}</p>
+                         
+                         {/* Item Count Hint */}
+                         {currentScenario && (
+                            <div className="flex items-center gap-2 text-sm font-bold text-slate-500 bg-slate-100 px-3 py-2 rounded-lg w-fit">
+                                <Info size={16} className="text-benq"/>
+                                <span>應選擇 <span className="text-benq text-lg mx-1">{currentScenario.required.length}</span> 項防護具</span>
+                            </div>
+                         )}
                     </div>
 
-                    {/* Character - Centered and Large */}
-                    <div className="flex-1 relative flex items-end justify-center pb-4 w-full">
-                         <div className="w-full h-full absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-slate-100 to-slate-200 -z-10 opacity-50"></div>
-                         <WorkerFigure className="scale-[0.85] origin-bottom translate-y-6" />
+                    {/* Right: Character Area */}
+                    <div className="w-5/12 relative bg-gradient-to-b from-white to-slate-100 flex justify-center items-end pb-8">
+                         <WorkerFigure className="scale-[0.42] sm:scale-75 -translate-y-8" />
                     </div>
                 </div>
 
-                {/* 3. Category Bar (Fixed Bottom above Footer) */}
-                <div className="flex-none bg-white border-t border-slate-100 px-2 py-2 z-30">
-                     <div className="grid grid-cols-5 gap-1">
-                        {CATEGORY_GROUPS.map((group) => {
-                            const Icon = group.icon;
-                            const count = countWornInGroup(group);
-                            const isActive = openGroupId === group.id;
-                            
-                            return (
-                                <button 
-                                    key={group.id} 
-                                    onClick={() => setOpenGroupId(group.id)}
-                                    disabled={gameState !== 'playing'}
-                                    className={`relative flex flex-col items-center justify-center py-2 rounded-lg transition-all active:scale-95
-                                    ${isActive ? 'bg-benq text-white shadow-md' : 'bg-slate-50 text-slate-500 hover:bg-slate-100'}`}
-                                >
-                                    {count > 0 && (
-                                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold border border-white shadow-sm">
-                                            {count}
-                                        </span>
-                                    )}
-                                    <Icon size={20} />
-                                    <span className="text-[10px] font-bold mt-1">{group.name}</span>
-                                </button>
-                            )
-                        })}
-                     </div>
+                {/* 3. Bottom Section: Tabs + Equipment Grid (Flex 1) */}
+                <div className="flex-1 flex flex-col min-h-0 bg-white">
+                    {/* Category Tabs */}
+                    <div className="flex-none p-2 border-b border-slate-100 bg-white shadow-sm z-10">
+                         <div className="grid grid-cols-5 gap-1">
+                            {CATEGORY_GROUPS.map((group) => {
+                                const Icon = group.icon;
+                                const count = countWornInGroup(group);
+                                const isActive = activeGroupId === group.id;
+                                
+                                return (
+                                    <button 
+                                        key={group.id} 
+                                        onClick={() => setActiveGroupId(group.id)}
+                                        disabled={gameState !== 'playing'}
+                                        className={`relative flex flex-col items-center justify-center py-2 rounded-lg transition-all active:scale-95
+                                        ${isActive ? 'bg-benq text-white shadow-md' : 'bg-slate-50 text-slate-500 hover:bg-slate-100'}`}
+                                    >
+                                        {count > 0 && (
+                                            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold border border-white shadow-sm">
+                                                {count}
+                                            </span>
+                                        )}
+                                        <Icon size={20} />
+                                        <span className="text-[10px] font-bold mt-1">{group.name}</span>
+                                    </button>
+                                )
+                            })}
+                         </div>
+                    </div>
+
+                    {/* Equipment Grid (Scrollable) */}
+                    <div className="flex-1 overflow-y-auto p-4 custom-scrollbar bg-slate-50 pb-24">
+                         <div className="grid grid-cols-4 gap-3 animate-fade-in" key={activeGroupId}>
+                             {EQUIPMENT_LIST
+                                .filter(item => CATEGORY_GROUPS.find(g => g.id === activeGroupId)?.categories.includes(item.category))
+                                .map((item) => {
+                                    const isWorn = wornItems.find(i => i.id === item.id);
+                                    const Icon = item.Component;
+                                    return (
+                                        <button key={item.id} onClick={() => toggleItem(item)} disabled={gameState !== 'playing'}
+                                            className={`relative flex flex-col items-center p-2 rounded-xl border-2 transition-all active:scale-95 h-24 justify-between
+                                            ${isWorn ? 'bg-purple-50 border-benq shadow-md' : 'bg-white border-slate-200'}`}
+                                        >
+                                            {isWorn && <div className="absolute top-1 right-1 text-benq"><CheckCircle size={14}/></div>}
+                                            <div className="w-8 h-8 flex items-center justify-center mt-1"><Icon /></div>
+                                            <div className="text-xs font-bold text-slate-600 text-center leading-tight w-full line-clamp-2">{item.name}</div>
+                                        </button>
+                                    )
+                                })}
+                         </div>
+                    </div>
                 </div>
 
-                {/* 4. Footer Actions */}
+                {/* 4. Footer Actions (Fixed) */}
                 <div className="flex-none bg-white px-4 py-3 border-t border-slate-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-30 pb-safe">
                     <div className="max-w-md mx-auto flex gap-2">
                         <button onClick={() => setWornItems([])} className="p-3 rounded-xl bg-slate-100 text-slate-500 border border-slate-300 active:scale-95"><RotateCcw size={18}/></button>
@@ -651,56 +690,6 @@
                         )}
                     </div>
                 </div>
-
-                {/* --- Pop-up Modal Layer --- */}
-                {openGroupId && (
-                    <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center p-4" style={{zIndex: 9999}}>
-                        {/* Backdrop */}
-                        <div className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-fade-in" onClick={() => setOpenGroupId(null)}></div>
-                        
-                        {/* Modal Content */}
-                        <div className="bg-white w-full max-w-sm rounded-2xl shadow-2xl z-50 overflow-hidden flex flex-col max-h-[70vh] animate-pop-up sm:animate-fade-in relative mb-16 sm:mb-0">
-                             <div className="flex justify-between items-center p-4 border-b border-slate-100 bg-slate-50">
-                                 <div className="font-bold text-slate-700 flex items-center gap-2">
-                                     {(() => {
-                                         const group = CATEGORY_GROUPS.find(g => g.id === openGroupId);
-                                         const Icon = group?.icon || Info;
-                                         return <><Icon size={20} className="text-benq"/> {group?.name}防護具</>;
-                                     })()}
-                                 </div>
-                                 <button onClick={() => setOpenGroupId(null)} className="p-1 rounded-full hover:bg-slate-200 text-slate-400">
-                                     <X size={20}/>
-                                 </button>
-                             </div>
-                             
-                             <div className="p-4 overflow-y-auto custom-scrollbar">
-                                 <div className="grid grid-cols-3 gap-3">
-                                     {EQUIPMENT_LIST
-                                        .filter(item => CATEGORY_GROUPS.find(g => g.id === openGroupId)?.categories.includes(item.category))
-                                        .map((item) => {
-                                            const isWorn = wornItems.find(i => i.id === item.id);
-                                            const Icon = item.Component;
-                                            return (
-                                                <button key={item.id} onClick={() => toggleItem(item)}
-                                                    className={`relative flex flex-col items-center p-2 rounded-xl border-2 transition-all active:scale-95 h-24 justify-between
-                                                    ${isWorn ? 'bg-purple-50 border-benq shadow-md' : 'bg-white border-slate-200'}`}
-                                                >
-                                                    {isWorn && <div className="absolute top-1 right-1 text-benq"><CheckCircle size={14}/></div>}
-                                                    <div className="w-8 h-8 flex items-center justify-center mt-1"><Icon /></div>
-                                                    <div className="text-xs font-bold text-slate-600 text-center leading-tight w-full line-clamp-2">{item.name}</div>
-                                                </button>
-                                            )
-                                        })}
-                                 </div>
-                             </div>
-                             <div className="p-3 bg-slate-50 border-t border-slate-100 text-center">
-                                 <button onClick={() => setOpenGroupId(null)} className="w-full bg-slate-800 text-white py-2 rounded-lg font-bold text-sm">
-                                     完成選擇
-                                 </button>
-                             </div>
-                        </div>
-                    </div>
-                )}
 
                 {/* 結果彈窗 (Overlay) */}
                 {message && gameState !== 'playing' && gameState !== 'leaderboard' && gameState !== 'result' && (
