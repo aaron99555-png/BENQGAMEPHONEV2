@@ -644,7 +644,7 @@
                                                 {count}
                                             </span>
                                         )}
-                                        <Icon size={14} />
+                                        <Icon size={12} />
                                         <span className="text-[10px] font-bold mt-0.5">{group.name}</span>
                                     </button>
                                 )
@@ -662,11 +662,11 @@
                                     const Icon = item.Component;
                                     return (
                                         <button key={item.id} onClick={() => toggleItem(item)} disabled={gameState !== 'playing'}
-                                            className={`relative flex flex-col items-center p-2 rounded-xl border-2 transition-all active:scale-95 h-24 justify-between
+                                            className={`relative flex flex-col items-center p-2 rounded-xl border-2 transition-all active:scale-95 h-20 justify-between
                                             ${isWorn ? 'bg-purple-50 border-benq shadow-md' : 'bg-white border-slate-200'}`}
                                         >
                                             {isWorn && <div className="absolute top-1 right-1 text-benq"><CheckCircle size={14}/></div>}
-                                            <div className="w-8 h-8 flex items-center justify-center mt-1"><Icon /></div>
+                                            <div className="w-6 h-6 flex items-center justify-center mt-1"><Icon /></div>
                                             <div className="text-xs font-bold text-slate-600 text-center leading-tight w-full line-clamp-2">{item.name}</div>
                                         </button>
                                     )
