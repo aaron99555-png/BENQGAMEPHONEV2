@@ -12,7 +12,6 @@
             padding: 0; 
             background-color: #f8fafc;
             overscroll-behavior: none;
-            /* Ensure full height and prevent bounce */
             position: fixed;
             width: 100%;
             height: 100%;
@@ -20,7 +19,6 @@
             flex-direction: column;
         }
         
-        /* Safe area handling for modern phones */
         .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
         .pt-safe { padding-top: env(safe-area-inset-top); }
 
@@ -100,7 +98,6 @@
         .rank-2 { color: #94a3b8; font-weight: bold; } /* Silver */
         .rank-3 { color: #b45309; font-weight: bold; } /* Bronze */
         
-        /* Responsive tweaks */
         @media (max-width: 380px) {
             .leaderboard-table { font-size: 0.75rem; }
             .leaderboard-table th, .leaderboard-table td { padding: 4px; }
@@ -122,34 +119,28 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-analytics.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
         import { getFirestore, collection, addDoc, getDocs, serverTimestamp, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
 
-        // Fallback config if environment variable is missing
-        const defaultConfig = {
-            apiKey: "AIzaSyDwd5lS02P0sbD8aOHl61NmmIsa2zVaEbU",
-            authDomain: "benqgame-38336.firebaseapp.com",
-            projectId: "benqgame-38336",
-            storageBucket: "benqgame-38336.firebasestorage.app",
-            messagingSenderId: "814261297110",
-            appId: "1:814261297110:web:9225bd61d693f256f50e77",
-            measurementId: "G-CK717X7WES"
+        // Use environment provided config if available, otherwise fallback (though fallback might fail in preview)
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+          apiKey: "AIzaSyDwd5lS02P0sbD8aOHl61NmmIsa2zVaEbU",
+          authDomain: "benqgame-38336.firebaseapp.com",
+          projectId: "benqgame-38336",
+          storageBucket: "benqgame-38336.firebasestorage.app",
+          messagingSenderId: "814261297110",
+          appId: "1:814261297110:web:9225bd61d693f256f50e77",
+          measurementId: "G-CK717X7WES"
         };
 
-        // Use environment config if available, otherwise default
-        const firebaseConfig = (typeof __firebase_config !== 'undefined' && __firebase_config) 
-            ? JSON.parse(__firebase_config) 
-            : defaultConfig;
-
         try {
-            // Initialize Firebase
             const app = initializeApp(firebaseConfig);
-            // Only init analytics if supported/needed, skipping to avoid errors in some sandboxes
-            // const analytics = getAnalytics(app); 
+            // Analytics might not be initialized if not supported in environment
+            try { const analytics = getAnalytics(app); } catch(e) {}
+            
             const auth = getAuth(app);
             const db = getFirestore(app);
 
-            // Expose services to window for React component to access
             window.firebaseServices = {
                 auth,
                 db,
@@ -159,38 +150,15 @@
                 getDocs,
                 serverTimestamp,
                 query, 
-                // orderBy, // Avoiding complex query constructs that might require indexes
-                // limit
+                orderBy, 
+                limit
             };
 
             console.log("Firebase initialized successfully");
 
-            // Authentication Logic: Prioritize Custom Token, fallback to Anonymous
-            const initAuth = async () => {
-                try {
-                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                        console.log("Attempting sign-in with custom token...");
-                        await signInWithCustomToken(auth, __initial_auth_token);
-                    } else {
-                        console.log("Attempting anonymous sign-in...");
-                        await signInAnonymously(auth);
-                    }
-                    console.log("Firebase: Signed in as", auth.currentUser?.uid);
-                    window.isFirebaseAuthReady = true;
-                } catch (error) {
-                    console.warn("Firebase: Primary sign-in failed", error);
-                    // Fallback: If custom token failed, try anonymous
-                    try {
-                        await signInAnonymously(auth);
-                        console.log("Firebase: Fallback anonymous sign-in success");
-                        window.isFirebaseAuthReady = true;
-                    } catch (fallbackError) {
-                        console.error("Firebase: All sign-in attempts failed", fallbackError);
-                    }
-                }
-            };
-
-            initAuth();
+            signInAnonymously(auth)
+                .then(() => console.log("Firebase: Signed in anonymously"))
+                .catch((error) => console.warn("Firebase: Sign-in failed", error.message));
 
         } catch (error) {
             console.error("Firebase Initialization Error:", error);
@@ -251,7 +219,7 @@
 
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
-        const apiKey = ""; // Gemini API Key (injected by environment)
+        const apiKey = ""; 
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
         // --- Icon Components ---
@@ -262,7 +230,7 @@
         const Lightbulb = (p) => <IconBase {...p}><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-1 1.5-2 1.5-3.5A6 6 0 0 0 6 8c0 1 .5 2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"></path><path d="M9 18h6"></path><path d="M10 22h4"></path></IconBase>;
         const AlertTriangle = (p) => <IconBase {...p}><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></IconBase>;
         const History = (p) => <IconBase {...p}><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path><path d="M12 7v5l4 2"></path></IconBase>;
-        const Building2 = (p) => <IconBase {...p}><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"></path><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"></path><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"></path><path d="M10 6h4"></path><path d="M10 10h4"></path><path d="M10 14h4"></path><path d="M10 18h4"></path></IconBase>;
+        const Building2 = (p) => <IconBase {...p}><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"></path><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"></path><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"></path><path d="M10 6h4"></path><path d="M10 10h4"></path><path d="M10 14h4"></path><path d="M10 18h4"></path></IconBase>;
         const UserCheck = (p) => <IconBase {...p}><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><polyline points="16 11 18 13 22 9"></polyline></IconBase>;
         const Upload = (p) => <IconBase {...p}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></IconBase>;
         const Trophy = (p) => <IconBase {...p}><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M9 14.66V17a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-2.34l-3.14-3.14a3 3 0 0 1-.72-1.54l-.52-2.28"></path><path d="M19.42 4.94A2 2 0 0 0 18 4H6a2 2 0 0 0-1.42.94L2 9.07a2.12 2.12 0 0 0 .59 2.14l8.28 7.37a2 2 0 0 0 2.26 0l8.28-7.37a2.12 2.12 0 0 0 .59-2.14z"></path></IconBase>;
@@ -342,11 +310,10 @@
             { id: 15, title: '局限空間作業', description: '進入通風不良之槽體進行清理時，應配戴哪些安全防護具？', hint: '「缺氧/中毒」除通風外需防止吸入有害氣體並確保受困時能被拉出', required: ['mask_gas', 'harness', 'lanyard'] },
             { id: 16, title: '紫外線/強光操作作業', description: '操作紫外線/強光設備時，應配戴哪些安全防護具？', hint: '「外線/強光」防止特定波長之強光對眼睛造成永久性傷害', required: ['glasses_uv'] },
             { id: 17, title: '廢棄物清理/資源回收整理', description: '含有尖銳物（如鐵釘、碎玻璃）的廢棄物時，應配戴哪些安全防護具？', hint: '「刺傷危害」防止腳底被刺穿及手部被割傷', required: ['safety_shoes', 'gloves_cut'] },
-            // REMOVED: Scenario 18 戶外高溫巡檢作業
-            { id: 19, title: '鍋爐加藥作業', description: '人員於鍋爐區進行加藥作業時，應配戴哪些完整安全防護具？', hint: '「化學/壓傷/噪音」注意避免接觸化學物質，保護眼睛、手部及身體，防止重物壓傷腳部，並配戴耳塞', required: ['helmet', 'earmuffs', 'goggles', 'gloves_rubber', 'apron', 'safety_shoes'] },
-            { id: 20, title: '烘箱取物作業', description: '需取出烘箱內之物品時，應配戴哪些安全防護具？', hint: '「高溫危害」 防止手部及身體直接接觸高溫工件或設備造成燙傷', required: ['gloves_heat', 'apron'] },
-            { id: 21, title: '塗頭管件清洗作業', description: '拆除後管件使用有機溶劑進行清洗時，應配戴哪些安全防護具？', hint: '「化學危害」 避免吸入有機溶劑氣體，並防止溶劑噴濺傷及眼睛與皮膚', required: ['mask_gas', 'goggles', 'gloves_rubber', 'apron'] },
-            { id: 22, title: '實驗室滴定作業', description: '使用化學品進行滴定作業時，應配戴哪些完整安全防護具？', hint: '「化學危害」為防止化學品噴濺，應保護眼睛、呼吸道、身體、手部及腳部，配戴個人防護具', required: ['goggles', 'mask_dust', 'gloves_rubber', 'safety_shoes'] }
+            { id: 18, title: '鍋爐加藥作業', description: '人員於鍋爐區進行加藥作業時，應配戴哪些完整安全防護具？', hint: '「化學/壓傷/噪音」注意避免接觸化學物質，保護眼睛、手部及身體，防止重物壓傷腳部，並配戴耳塞', required: ['helmet', 'earmuffs', 'goggles', 'gloves_rubber', 'apron', 'safety_shoes'] },
+            { id: 19, title: '烘箱取物作業', description: '需取出烘箱內之物品時，應配戴哪些安全防護具？', hint: '「高溫危害」 防止手部及身體直接接觸高溫工件或設備造成燙傷', required: ['gloves_heat', 'apron'] },
+            { id: 20, title: '塗頭管件清洗作業', description: '拆除後管件使用有機溶劑進行清洗時，應配戴哪些安全防護具？', hint: '「化學危害」 避免吸入有機溶劑氣體，並防止溶劑噴濺傷及眼睛與皮膚', required: ['mask_gas', 'goggles', 'gloves_rubber', 'apron'] },
+            { id: 21, title: '實驗室滴定作業', description: '使用化學品進行滴定作業時，應配戴哪些完整安全防護具？', hint: '「化學危害」為防止化學品噴濺，應保護眼睛、呼吸道、身體、手部及腳部，配戴個人防護具', required: ['goggles', 'mask_dust', 'gloves_rubber', 'safety_shoes'] }
         ];
 
         const TOTAL_ROUNDS = 10;
@@ -354,7 +321,7 @@
         function SafetyGearGame() {
           const [currentScenario, setCurrentScenario] = useState(null);
           const [wornItems, setWornItems] = useState([]);
-          const [gameState, setGameState] = useState('start'); 
+          const [gameState, setGameState] = useState('start'); // 'start', 'playing', 'success', 'warning' (partial), 'failure', 'result'
           const [message, setMessage] = useState('');
           const [failDetails, setFailDetails] = useState(null);
           const [score, setScore] = useState(0);
@@ -371,23 +338,11 @@
           const [employeeId, setEmployeeId] = useState('');
           const [isBlinking, setIsBlinking] = useState(false);
           const [isTtsLoading, setIsTtsLoading] = useState(false);
-          const [isAuthReady, setIsAuthReady] = useState(false);
           
           const audioRef = useRef(null);
           const [activeGroupId, setActiveGroupId] = useState(CATEGORY_GROUPS[0].id);
 
           const formatTime = (ms) => (ms / 1000).toFixed(2);
-
-          // Check for auth readiness
-          useEffect(() => {
-              const checkAuth = setInterval(() => {
-                  if (window.isFirebaseAuthReady) {
-                      setIsAuthReady(true);
-                      clearInterval(checkAuth);
-                  }
-              }, 500);
-              return () => clearInterval(checkAuth);
-          }, []);
 
           useEffect(() => {
             let interval = null;
@@ -414,6 +369,7 @@
                  setSaveStatus("saving");
                  try {
                      const { db, collection, addDoc, serverTimestamp } = window.firebaseServices;
+                     // Use standard path structure for artifacts
                      await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'scores'), {
                          departmentId: departmentId,
                          employeeId: employeeId,
@@ -436,9 +392,8 @@
           const fetchLeaderboard = async () => {
               if (window.firebaseServices && window.firebaseServices.db) {
                   try {
-                      const { db, collection, getDocs, query } = window.firebaseServices;
+                      const { db, collection, getDocs, query, orderBy, limit } = window.firebaseServices;
                       
-                      // Fetch all scores first (No orderBy/limit to prevent index requirements)
                       const q = collection(db, 'artifacts', appId, 'public', 'data', 'scores');
                       const querySnapshot = await getDocs(q);
                       
@@ -468,7 +423,7 @@
                       // Convert back to array
                       const uniqueScores = Array.from(bestScoresMap.values());
 
-                      // Sort final list in JS
+                      // Sort final list
                       uniqueScores.sort((a, b) => {
                           if (b.score !== a.score) {
                               return b.score - a.score;
@@ -580,10 +535,10 @@
                   if (base64Audio) {
                       const audioSrc = `data:audio/mp3;base64,${base64Audio}`; 
                       const audio = new Audio(audioSrc);
-                      audio.play();
                       audioRef.current = audio;
+                      audio.play();
                   } else {
-                      // Fallback to Web Speech API
+                      // Fallback to browser TTS
                       const utterance = new SpeechSynthesisUtterance(textToRead);
                       utterance.lang = 'zh-TW';
                       window.speechSynthesis.speak(utterance);
@@ -680,7 +635,7 @@
                         {/* Shadow: Put it here so it scales/moves with lion */}
                         {/* Positioned at bottom, centered horizontally */}
                         <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-48 h-6 bg-black/20 rounded-[100%] blur-sm z-0"></div>
-       
+        
                         {/* Character Content (Z-index > 0 to stand on shadow) */}
                         <div className="relative z-10 flex flex-col items-center">
                             
@@ -691,7 +646,7 @@
                                     <circle cx="50" cy="50" r="48" fill="#C27803" stroke="#92400E" strokeWidth="2" />
                                 </svg>
                                 </div>
-       
+        
                                 {ears && (
                                 <div className="absolute top-8 w-full flex justify-between px-2 z-20 pointer-events-none">
                                     <div className={`w-5 h-10 ${ears.color} rounded-lg border-2 border-gray-700 shadow-sm -ml-4`}></div>
@@ -699,7 +654,7 @@
                                     <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-44 h-12 border-t-4 border-gray-700 rounded-full"></div>
                                 </div>
                                 )}
-       
+        
                                 <div className="relative w-28 h-32 z-10 top-2">
                                 <svg viewBox="0 0 100 120" className="w-full h-full overflow-visible">
                                     <circle cx="20" cy="10" r="12" fill="#FCD34D" stroke="#C27803" strokeWidth="2" />
@@ -720,7 +675,7 @@
                                         : <path d="M 40 95 Q 50 90 60 95" fill="#F472B6" /> 
                                     }
                                 </svg>
-       
+        
                                 {/* 裝備層 */}
                                 {eyes && (
                                     <div className="absolute top-8 left-1/2 -translate-x-1/2 z-50">
@@ -743,7 +698,7 @@
                                 )}
                                 </div>
                             </div>
-       
+        
                             {/* 身體 (Purple) */}
                             <div className="relative z-20 -mt-2">
                                 <div className={`absolute -left-8 top-6 w-10 h-32 bg-[#FCD34D] rounded-full origin-top transform rotate-12 border-2 border-[#C27803] flex flex-col justify-end items-center z-0 transition-transform ${isHappy ? '-rotate-[140deg] -translate-x-4' : ''}`}></div>
@@ -776,7 +731,7 @@
                                 </>
                                 )}
                             </div>
-       
+        
                             {/* 腿部 */}
                             <div className="flex gap-1 -mt-4 z-10">
                                 <div className="w-16 h-32 bg-slate-800 rounded-b-lg border-2 border-slate-900 relative flex justify-center shadow-lg">
@@ -874,9 +829,7 @@
                                                     ))
                                                 ) : (
                                                     <tr>
-                                                        <td colSpan="5" className="text-center text-slate-400 py-4">
-                                                            {isAuthReady ? '暫無資料...' : '資料載入中...'}
-                                                        </td>
+                                                        <td colSpan="5" className="text-center text-slate-400 py-4">暫無資料...</td>
                                                     </tr>
                                                 )}
                                             </tbody>
@@ -913,20 +866,19 @@
                                     </div>
                                 </div>
 
-                                <button onClick={startGame} disabled={!employeeId || !departmentId || !isAuthReady} className="w-full bg-benq hover:bg-purple-800 text-white py-4 rounded-2xl font-bold shadow-lg shadow-purple-200 active:scale-95 transition-all flex items-center justify-center gap-2 mt-4 disabled:opacity-50 disabled:cursor-not-allowed">
-                                    {isAuthReady ? <>開始挑戰 <ArrowRight size={20} /></> : '資料庫連線中...'}
+                                <button onClick={startGame} disabled={!employeeId || !departmentId} className="w-full bg-benq hover:bg-purple-800 text-white py-4 rounded-2xl font-bold shadow-lg shadow-purple-200 active:scale-95 transition-all flex items-center justify-center gap-2 mt-4 disabled:opacity-50 disabled:cursor-not-allowed">
+                                    開始挑戰 <ArrowRight size={20} />
                                 </button>
 
                                 <div className="mt-4 bg-purple-50 rounded-xl p-4 text-sm text-slate-600 border border-purple-100">
                                     <div className="font-bold text-benq flex items-center gap-2 mb-2">
-                                        <Info size={16} /> 遊戲規則說明
+                                        <Trophy size={16} /> 評分與排名機制
                                     </div>
                                     <ul className="list-disc list-inside space-y-1 text-xs">
-                                        <li><span className="font-bold text-slate-800">完全正確</span>：選擇正確且無多餘裝備，得 <span className="font-bold text-benq">100</span> 分</li>
-                                        <li><span className="font-bold text-slate-800">部分正確</span>：包含正確裝備但有多選，得 <span className="font-bold text-amber-600">50</span> 分</li>
-                                        <li><span className="font-bold text-slate-800">錯誤/違規</span>：少選必要裝備或違反禁忌，得 <span className="font-bold text-red-500">0</span> 分</li>
-                                        <li><span className="font-bold text-slate-800">提示扣分</span>：使用提示將扣除 <span className="font-bold text-red-500">20</span> 分</li>
-                                        <li><span className="font-bold text-slate-800">總分計算</span>：共 10 題，滿分 1000 分</li>
+                                        <li>完美防護：每答對一題獲得 <span className="font-bold text-slate-800">100</span> 分</li>
+                                        <li>部分正確：多餘裝備獲得 <span className="font-bold text-orange-600">50</span> 分</li>
+                                        <li>嚴重違規/不完整：<span className="font-bold text-red-500">0</span> 分</li>
+                                        <li>扣分：每次使用提示扣 <span className="font-bold text-red-500">20</span> 分</li>
                                     </ul>
                                 </div>
                             </div>
@@ -1068,18 +1020,18 @@
                 {/* 結果彈窗 (Overlay) */}
                 {message && gameState !== 'playing' && gameState !== 'leaderboard' && gameState !== 'result' && (
                     <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white/95 backdrop-blur shadow-2xl border-2 border-slate-100 rounded-2xl p-6 w-4/5 max-h-[85vh] overflow-y-auto custom-scrollbar text-center z-50 animate-fade-in flex flex-col">
-                        <div className={`text-xl font-black mb-2 
-                            ${gameState === 'success' ? 'text-green-500' : 
+                        <div className={`text-xl font-black mb-2 
+                            ${gameState === 'success' ? 'text-green-500' : 
                               gameState === 'warning' ? 'text-amber-500' : 'text-red-500'}`}>
-                            {gameState === 'success' ? '完美防護！' : 
+                            {gameState === 'success' ? '完美防護！' : 
                              gameState === 'warning' ? '部分正確！' : '哎呀...'}
                         </div>
                         <p className="text-sm text-slate-600 font-bold mb-4">{message}</p>
                         
                         {/* 顯示正確/錯誤詳情區域 */}
                         {failDetails && (
-                            <div className={`rounded-xl p-3 text-left border text-xs mb-3 
-                                ${gameState === 'success' ? 'bg-green-50 border-green-100' : 
+                            <div className={`rounded-xl p-3 text-left border text-xs mb-3 
+                                ${gameState === 'success' ? 'bg-green-50 border-green-100' : 
                                   gameState === 'warning' ? 'bg-amber-50 border-amber-100' : 'bg-red-50 border-red-100'}`}>
                                 
                                 {failDetails.type === 'missing' && failDetails.missing && failDetails.missing.length > 0 && (
