@@ -70,7 +70,7 @@
         y: 0,
         width: 100,
         height: 60,
-        speed: 15, // 鍵盤移動速度
+        speed: 25, // 速度提升 (15 -> 25) 以應對高難度
         color: '#FFD700',
         isMovingLeft: false,
         isMovingRight: false
@@ -78,10 +78,10 @@
 
     // 掉落物類型定義
     const ITEM_TYPES = {
-        RED_PACKET: { emoji: '🧧', score: 10, weight: 60, speedBase: 3, type: 'good' },
-        INGOT: { emoji: '💰', score: 50, weight: 20, speedBase: 5, type: 'good' },
-        BOMB: { emoji: '💣', score: 0, weight: 15, speedBase: 4, type: 'bad' },
-        FIRECRACKER: { emoji: '🧨', score: 0, weight: 5, speedBase: 6, type: 'bad' }
+        RED_PACKET: { emoji: '🧧', score: 10, weight: 60, speedBase: 5, type: 'good' }, // 基礎速度 3 -> 5
+        INGOT: { emoji: '💰', score: 50, weight: 20, speedBase: 8, type: 'good' }, // 基礎速度 5 -> 8
+        BOMB: { emoji: '💣', score: 0, weight: 15, speedBase: 7, type: 'bad' }, // 基礎速度 4 -> 7
+        FIRECRACKER: { emoji: '🧨', score: 0, weight: 5, speedBase: 10, type: 'bad' } // 基礎速度 6 -> 10
     };
 
     // --- 初始化與事件監聽 ---
@@ -192,23 +192,23 @@
         const elapsedTime = GAME_DURATION - timeLeft;
         
         // 1. 生成頻率：時間越少，掉得越密
-        // 初始每 60 幀(約1秒)生成一次，最快每 15 幀(約0.25秒)生成一次
-        const currentSpawnRate = Math.max(15, 60 - Math.floor(elapsedTime * 0.8));
+        // 初始每 40 幀(約0.7秒)生成一次，最快每 6 幀(約0.1秒)生成一次 - 極速模式
+        const currentSpawnRate = Math.max(6, 40 - Math.floor(elapsedTime * 0.8));
         
         if (frameCount % currentSpawnRate === 0) {
             const r = Math.random() * 100;
             let selectedType = ITEM_TYPES.RED_PACKET;
 
-            // 炸彈機率隨分數和時間微幅增加
-            let bombChanceAdd = Math.min(25, Math.floor(score / 100) + Math.floor(elapsedTime / 5)); 
+            // 炸彈機率隨分數和時間大幅增加 (上限提高到 45%)
+            let bombChanceAdd = Math.min(45, Math.floor(score / 50) + Math.floor(elapsedTime / 2)); 
             
             if (r < 60 - bombChanceAdd) selectedType = ITEM_TYPES.RED_PACKET;
             else if (r < 80 - bombChanceAdd) selectedType = ITEM_TYPES.INGOT;
             else selectedType = Math.random() > 0.5 ? ITEM_TYPES.BOMB : ITEM_TYPES.FIRECRACKER;
 
             // 2. 掉落速度：隨時間顯著變快
-            // 基礎倍率為 1，時間快結束時接近 2.5倍速
-            const timeSpeedMultiplier = 1 + (elapsedTime / GAME_DURATION) * 1.5;
+            // 起始 1.2 倍速，結束時接近 4.0 倍速 (原本是 2.5)
+            const timeSpeedMultiplier = 1.2 + (elapsedTime / GAME_DURATION) * 2.8;
 
             const size = 40;
             items.push({
@@ -316,10 +316,16 @@
         });
         ctx.restore();
 
+        // 繪製掉落物 (修正: 增加顏色設定與字型，解決看不見的問題)
+        ctx.save();
+        ctx.fillStyle = "#FFFFFF"; // 強制設定為白色，避免被背景色吃掉
+        ctx.textBaseline = 'top'; // 改為上方對齊，讓位置更精確
         items.forEach(item => {
-            ctx.font = `${item.size}px Arial`;
-            ctx.fillText(item.emoji, item.x, item.y + item.size);
+            // 使用多種 Emoji 字型以確保相容性
+            ctx.font = `${item.size}px "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", "Android Emoji", Arial, sans-serif`;
+            ctx.fillText(item.emoji, item.x, item.y);
         });
+        ctx.restore();
 
         drawPlayer();
 
