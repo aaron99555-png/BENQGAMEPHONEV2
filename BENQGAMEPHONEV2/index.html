@@ -2,1123 +2,414 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>BenQ Materials Safety Gear Challenge</title>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>馬年接紅包 - 鴻運當頭</title>
     <style>
-        body { 
-            font-family: "Microsoft JhengHei", "Heiti TC", sans-serif; 
-            margin: 0; 
-            padding: 0; 
-            background-color: #f8fafc;
-            overscroll-behavior: none;
-            position: fixed;
-            width: 100%;
-            height: 100%;
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #800000; /* 深紅色背景 */
+            font-family: "Microsoft JhengHei", "Heiti TC", sans-serif;
+            touch-action: none; /* 防止手機上下滑動 */
+        }
+        canvas {
+            display: block;
+        }
+        #ui-layer {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
             display: flex;
-            flex-direction: column;
-        }
-        
-        .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
-        .pt-safe { padding-top: env(safe-area-inset-top); }
-
-        .loading-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            background: #ffffff; z-index: 9999; text-align: center;
-        }
-        .loading-spinner {
-            border: 4px solid #f3f3f3; border-top: 4px solid #652d90; border-radius: 50%;
-            width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 20px;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(101, 45, 144, 0.3); border-radius: 4px; }
-
-        .bg-gradient-animate {
-            background: linear-gradient(-45deg, #652d90, #4a1d6e, #8e56b8, #652d90);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-        }
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        
-        /* Animation utilities */
-        .animate-fade-in { animation: fadeIn 0.3s ease-out; }
-        .animate-slide-up { animation: slideUp 0.3s ease-out; }
-        .animate-pulse-slow { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: .5; }
-        }
-
-        /* Leaderboard Table Styles */
-        .leaderboard-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.85rem;
-        }
-        .leaderboard-table th {
-            background-color: #f3f4f6;
-            color: #64748b;
+            justify-content: space-between;
+            color: #FFD700; /* 金色 */
+            font-size: 24px;
             font-weight: bold;
-            text-align: left;
-            padding: 8px;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-        .leaderboard-table td {
-            padding: 8px;
-            border-bottom: 1px solid #e2e8f0;
-            color: #334155;
-        }
-        .leaderboard-table tr:nth-child(even) {
-            background-color: #f8fafc;
-        }
-        .leaderboard-table tr.highlight {
-            background-color: #f3e8ff; /* Light purple for current user */
-            font-weight: bold;
-        }
-        .rank-1 { color: #eab308; font-weight: bold; } /* Gold */
-        .rank-2 { color: #94a3b8; font-weight: bold; } /* Silver */
-        .rank-3 { color: #b45309; font-weight: bold; } /* Bronze */
-        
-        @media (max-width: 380px) {
-            .leaderboard-table { font-size: 0.75rem; }
-            .leaderboard-table th, .leaderboard-table td { padding: 4px; }
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            pointer-events: none;
         }
     </style>
-
-    <script>
-        function handleScriptError(e) {
-            console.error("Script load error:", e);
-        }
-    </script>
-    
-    <script src="https://cdn.tailwindcss.com" onerror="handleScriptError(this)"></script>
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js" onerror="handleScriptError(this)"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" onerror="handleScriptError(this)"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js" onerror="handleScriptError(this)"></script>
-
-    <!-- Firebase SDKs Integration -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-analytics.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, serverTimestamp, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
-
-        // Use environment provided config if available, otherwise fallback (though fallback might fail in preview)
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-          apiKey: "AIzaSyDwd5lS02P0sbD8aOHl61NmmIsa2zVaEbU",
-          authDomain: "benqgame-38336.firebaseapp.com",
-          projectId: "benqgame-38336",
-          storageBucket: "benqgame-38336.firebasestorage.app",
-          messagingSenderId: "814261297110",
-          appId: "1:814261297110:web:9225bd61d693f256f50e77",
-          measurementId: "G-CK717X7WES"
-        };
-
-        try {
-            const app = initializeApp(firebaseConfig);
-            // Analytics might not be initialized if not supported in environment
-            try { const analytics = getAnalytics(app); } catch(e) {}
-            
-            const auth = getAuth(app);
-            const db = getFirestore(app);
-
-            window.firebaseServices = {
-                auth,
-                db,
-                signInAnonymously,
-                signInWithCustomToken,
-                onAuthStateChanged,
-                collection,
-                addDoc,
-                getDocs,
-                serverTimestamp,
-                query, 
-                orderBy, 
-                limit
-            };
-
-            console.log("Firebase initialized successfully");
-
-            // Handle Authentication based on available token or fallback
-            const initAuth = async () => {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    try {
-                        await signInWithCustomToken(auth, __initial_auth_token);
-                        console.log("Firebase: Signed in with custom token");
-                    } catch (e) {
-                        console.warn("Firebase: Custom token sign-in failed, falling back to anonymous", e);
-                        try {
-                            await signInAnonymously(auth);
-                            console.log("Firebase: Signed in anonymously (fallback)");
-                        } catch (anonError) {
-                            console.error("Firebase: Anonymous sign-in also failed", anonError);
-                        }
-                    }
-                } else {
-                    try {
-                        await signInAnonymously(auth);
-                        console.log("Firebase: Signed in anonymously");
-                    } catch (e) {
-                        console.error("Firebase: Anonymous sign-in failed", e);
-                    }
-                }
-            };
-
-            initAuth();
-
-        } catch (error) {
-            console.error("Firebase Initialization Error:", error);
-            window.firebaseServices = null;
-        }
-    </script>
-
-    <script>
-        window.onload = function() {
-            if (typeof tailwind !== 'undefined') {
-                tailwind.config = {
-                    theme: {
-                        extend: {
-                            colors: {
-                                benq: {
-                                    DEFAULT: '#652d90',
-                                    hover: '#502379',
-                                    light: '#8e56b8',
-                                    dark: '#4a1d6e',
-                                },
-                            },
-                            animation: {
-                                'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                                'shake': 'shake 0.5s ease-in-out',
-                                'fade-in': 'fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-                                'slide-up': 'slideUp 0.5s ease-out',
-                            },
-                            keyframes: {
-                                shake: {
-                                    '0%, 100%': { transform: 'translateX(0)' },
-                                    '25%': { transform: 'translateX(-5px)' },
-                                    '75%': { transform: 'translateX(5px)' },
-                                },
-                                fadeIn: {
-                                    'from': { opacity: '0', transform: 'translateY(10px)' },
-                                    'to': { opacity: '1', transform: 'translateY(0)' },
-                                },
-                                slideUp: {
-                                    'from': { opacity: '0', transform: 'translateY(20px)' },
-                                    'to': { opacity: '1', transform: 'translateY(0)' },
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    </script>
 </head>
-<body class="bg-slate-100 h-[100dvh] w-full overflow-hidden flex flex-col items-center justify-center">
+<body>
+
+<!-- UI 顯示：分數與時間 -->
+<div id="ui-layer">
+    <div>得分: <span id="score">0</span></div>
+    <div>時間: <span id="time">60</span>s</div>
+</div>
+
+<canvas id="gameCanvas"></canvas>
+
+<script>
+    // --- 遊戲設定與變數 ---
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreEl = document.getElementById('score');
+    const timeEl = document.getElementById('time');
+
+    let score = 0;
+    let isGameOver = false;
+    let isTimeUp = false; // 新增：是否因為時間到而結束
+    let animationId;
+    let frameCount = 0;
     
-    <div id="root" class="h-full w-full max-w-md bg-white shadow-2xl relative flex flex-col">
-        <div class="loading-screen">
-            <div class="loading-spinner"></div>
-            <h2 class="text-gray-600 text-xl font-bold">載入中...</h2>
-        </div>
-    </div>
+    // 時間設定
+    const GAME_DURATION = 60;
+    let timeLeft = GAME_DURATION;
+    let timerInterval = null;
 
-    <script type="text/babel">
-        const { useState, useEffect, useRef } = React;
-        const apiKey = ""; 
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+    // 遊戲物件陣列
+    let items = [];
+    let particles = [];
+    let bgDecorations = [];
 
-        // --- Icon Components ---
-        const IconBase = ({ size = 24, className = "", children, ...props }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}>{children}</svg>);
-        const CheckCircle = (p) => <IconBase {...p}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></IconBase>;
-        const RotateCcw = (p) => <IconBase {...p}><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></IconBase>;
-        const ArrowRight = (p) => <IconBase {...p}><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></IconBase>;
-        const Lightbulb = (p) => <IconBase {...p}><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-1 1.5-2 1.5-3.5A6 6 0 0 0 6 8c0 1 .5 2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"></path><path d="M9 18h6"></path><path d="M10 22h4"></path></IconBase>;
-        const AlertTriangle = (p) => <IconBase {...p}><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></IconBase>;
-        const History = (p) => <IconBase {...p}><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path><path d="M12 7v5l4 2"></path></IconBase>;
-        const Building2 = (p) => <IconBase {...p}><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"></path><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"></path><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"></path><path d="M10 6h4"></path><path d="M10 10h4"></path><path d="M10 14h4"></path><path d="M10 18h4"></path></IconBase>;
-        const UserCheck = (p) => <IconBase {...p}><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><polyline points="16 11 18 13 22 9"></polyline></IconBase>;
-        const Upload = (p) => <IconBase {...p}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></IconBase>;
-        const Trophy = (p) => <IconBase {...p}><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M9 14.66V17a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-2.34l-3.14-3.14a3 3 0 0 1-.72-1.54l-.52-2.28"></path><path d="M19.42 4.94A2 2 0 0 0 18 4H6a2 2 0 0 0-1.42.94L2 9.07a2.12 2.12 0 0 0 .59 2.14l8.28 7.37a2 2 0 0 0 2.26 0l8.28-7.37a2.12 2.12 0 0 0 .59-2.14z"></path></IconBase>;
-        const X = (p) => <IconBase {...p}><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></IconBase>;
-        const Info = (p) => <IconBase {...p}><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></IconBase>;
-        const Volume2 = (p) => <IconBase {...p}><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></IconBase>;
+    // 玩家設定 (聚寶盆)
+    const player = {
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 60,
+        speed: 15, // 鍵盤移動速度
+        color: '#FFD700',
+        isMovingLeft: false,
+        isMovingRight: false
+    };
 
-        // --- PPE Icons ---
-        const IconHelmet = ({color = "#FBBF24"}) => <svg viewBox="0 0 64 64" className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 36c0-14 10-26 28-26s28 12 28 26v4H4v-4z" fill={color} stroke="#D97706" /><path d="M32 10v4M4 36h56M12 36c0-4 2-8 6-8h28c4 0 6 4 6 8" stroke="#D97706" strokeLinecap="round"/><path d="M28 14h8" stroke="#D97706" strokeWidth="3"/></svg>;
-        const IconGoggles = ({lens = "#BFDBFE"}) => <svg viewBox="0 0 64 64" className="w-full h-full" fill="none"><path d="M12 28c0-6 4-10 10-10h6c2 0 4 2 4 4s2 4 4 4 4-2 4-4 2-4 4-4h6c6 0 10 4 10 10v6c0 6-4 10-10 10h-6c-2 0-4-2-4-4s-2-4-4-4-4 2-4 4-2 4-4 4h-6c-6 0-10-4-10-10v-6z" fill={lens} stroke="#2563EB" strokeWidth="3"/><path d="M4 30h8M52 30h8" stroke="#1F2937" strokeWidth="3" strokeLinecap="round"/></svg>;
-        const IconWeldingMask = () => <svg viewBox="0 0 64 64" className="w-full h-full" fill="none"><rect x="14" y="8" width="36" height="48" rx="8" fill="#1F2937" stroke="#000" strokeWidth="2"/><rect x="20" y="20" width="24" height="12" rx="2" fill="#111827" stroke="#F59E0B" strokeWidth="2"/><path d="M22 26h20" stroke="#F59E0B" strokeWidth="1" opacity="0.5"/></svg>;
-        const IconFaceShield = () => <svg viewBox="0 0 64 64" className="w-full h-full" fill="none"><path d="M16 12h32v4H16z" fill="#374151" stroke="#000" strokeWidth="2"/><path d="M16 16v32c0 8 8 12 16 12s16-4 16-12V16H16z" fill="#A7F3D0" stroke="#059669" strokeWidth="2" fillOpacity="0.6"/><path d="M24 24l16 16" stroke="#059669" strokeWidth="1" opacity="0.5"/></svg>;
-        const IconEarmuffs = () => <svg viewBox="0 0 64 64" className="w-full h-full" fill="none"><path d="M12 18a4 4 0 0 1 4-4h32a4 4 0 0 1 4 4v20" stroke="#374151" strokeWidth="3" strokeLinecap="round"/><rect x="6" y="24" width="12" height="24" rx="6" fill="#F97316" stroke="#C2410C" strokeWidth="2"/><rect x="46" y="24" width="12" height="24" rx="6" fill="#F97316" stroke="#C2410C" strokeWidth="2"/><path d="M10 30h4M50 30h4" stroke="#FFF" strokeOpacity="0.5"/></svg>;
-        const IconGasMask = () => <svg viewBox="0 0 64 64" className="w-full h-full" fill="none"><path d="M16 16h32v24c0 10-8 16-16 16s-16-6-16-16V16z" fill="#374151" stroke="#111827" strokeWidth="2"/><circle cx="22" cy="28" r="6" fill="#111827" stroke="#6B7280" strokeWidth="2"/><circle cx="42" cy="28" r="6" fill="#111827" stroke="#6B7280" strokeWidth="2"/><rect x="26" y="40" width="12" height="12" rx="2" fill="#4B5563" stroke="#9CA3AF" strokeWidth="2"/></svg>;
-        const IconN95 = () => <svg viewBox="0 0 64 64" className="w-full h-full" fill="none"><path d="M14 20c0-2 18-6 18-6s18 4 18 6c0 10-4 26-18 26s-18-16-18-26z" fill="#F9FAFB" stroke="#9CA3AF" strokeWidth="2"/><path d="M8 24h6M50 24h6" stroke="#FCA5A5" strokeWidth="2"/><circle cx="24" cy="28" r="2" fill="#D1D5DB"/></svg>;
-        const IconHarness = () => <svg viewBox="0 0 64 64" className="w-full h-full" fill="none"><path d="M16 8v48M48 8v48" stroke="#EF4444" strokeWidth="4"/><path d="M16 20h32M16 40h32" stroke="#EF4444" strokeWidth="4"/><path d="M16 12l32 40M48 12L16 52" stroke="#B91C1C" strokeWidth="3"/></svg>;
-        const IconVest = () => <svg viewBox="0 0 64 64" className="w-full h-full" fill="none"><path d="M12 12h12l8 16 8-16h12v40H12V12z" fill="#A3E635" stroke="#4D7C0F" strokeWidth="2"/><path d="M12 36h40M12 44h40" stroke="#E5E7EB" strokeWidth="4"/><path d="M22 12v40M42 12v40" stroke="#E5E7EB" strokeWidth="4"/></svg>;
-        const IconApron = () => <svg viewBox="0 0 64 64" className="w-full h-full" fill="none"><path d="M22 8h20v8H22z" stroke="#1D4ED8" strokeWidth="2"/><path d="M18 16h28l4 8v32H14V24l4-8z" fill="#2563EB" stroke="#1E40AF" strokeWidth="2"/><path d="M24 30h16" stroke="#60A5FA" strokeWidth="2" opacity="0.5"/></svg>;
-        const IconSuit = () => <svg viewBox="0 0 64 64" className="w-full h-full" fill="none"><path d="M20 4h24l4 12v44H16V16L20 4z" fill="#F8FAFC" stroke="#64748B" strokeWidth="2"/><path d="M32 4v56M16 32h32" stroke="#CBD5E1" strokeWidth="2"/><path d="M24 12h16" stroke="#94A3B8" strokeWidth="2"/></svg>;
-        const IconSleeves = () => <svg viewBox="0 0 64 64" className="w-full h-full" fill="none"><rect x="12" y="20" width="16" height="32" rx="4" fill="#60A5FA" stroke="#2563EB" strokeWidth="2"/><rect x="36" y="20" width="16" height="32" rx="4" fill="#60A5FA" stroke="#2563EB" strokeWidth="2"/><path d="M12 24h16M36 24h16" stroke="#93C5FD" strokeWidth="2"/></svg>;
-        const IconLanyard = () => <svg viewBox="0 0 64 64" className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="2"><path d="M48 12c0-4-3-8-8-8H24c-5 0-8 4-8 8v40" stroke="#F59E0B" strokeWidth="4" strokeLinecap="round"/><path d="M16 52l8 8 8-8" stroke="#F59E0B" strokeWidth="4"/><circle cx="40" cy="12" r="3" fill="#FFF"/></svg>;
+    // 掉落物類型定義
+    const ITEM_TYPES = {
+        RED_PACKET: { emoji: '🧧', score: 10, weight: 60, speedBase: 3, type: 'good' },
+        INGOT: { emoji: '💰', score: 50, weight: 20, speedBase: 5, type: 'good' },
+        BOMB: { emoji: '💣', score: 0, weight: 15, speedBase: 4, type: 'bad' },
+        FIRECRACKER: { emoji: '🧨', score: 0, weight: 5, speedBase: 6, type: 'bad' }
+    };
+
+    // --- 初始化與事件監聽 ---
+
+    function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        player.y = canvas.height - player.height - 20;
+        if (player.x > canvas.width - player.width) player.x = canvas.width - player.width;
+        initBgDecorations();
+    }
+
+    window.addEventListener('resize', resize);
+    window.addEventListener('load', () => {
+        resize();
+        player.x = canvas.width / 2 - player.width / 2;
+        initGame();
+        loop();
+    });
+
+    window.addEventListener('keydown', (e) => {
+        if (isGameOver && e.code === 'Space') {
+            restartGame();
+            return;
+        }
+        if (e.key === 'ArrowLeft') player.isMovingLeft = true;
+        if (e.key === 'ArrowRight') player.isMovingRight = true;
+    });
+
+    window.addEventListener('keyup', (e) => {
+        if (e.key === 'ArrowLeft') player.isMovingLeft = false;
+        if (e.key === 'ArrowRight') player.isMovingRight = false;
+    });
+
+    function movePlayerTo(clientX) {
+        if (isGameOver) return;
+        let newX = clientX - player.width / 2;
+        if (newX < 0) newX = 0;
+        if (newX > canvas.width - player.width) newX = canvas.width - player.width;
+        player.x = newX;
+    }
+
+    canvas.addEventListener('mousemove', (e) => {
+        movePlayerTo(e.clientX);
+    });
+
+    canvas.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        movePlayerTo(e.touches[0].clientX);
+    }, { passive: false });
+
+    canvas.addEventListener('click', () => {
+        if (isGameOver) {
+            restartGame();
+        }
+    });
+
+    // --- 遊戲邏輯 ---
+
+    function initGame() {
+        score = 0;
+        timeLeft = GAME_DURATION;
+        isGameOver = false;
+        isTimeUp = false;
+        items = [];
+        particles = [];
         
-        const IconGlove = ({ color, type }) => <svg viewBox="0 0 64 64" className="w-full h-full" fill="none"><path d="M20 54V30a4 4 0 0 1 8 0v-4a4 4 0 0 1 8 0v-2a4 4 0 0 1 8 0v4a4 4 0 0 1 8 0v26H20z" fill={color} stroke="#4B5563" strokeWidth="2"/><path d="M20 50h32" stroke="#000" strokeOpacity="0.1"/>{type === 'dot' && <circle cx="32" cy="40" r="1" fill="#000" opacity="0.2"/>}{type === 'line' && <path d="M28 36v10" stroke="#000" opacity="0.1"/>}</svg>;
-        const IconBoot = ({ color, sole }) => <svg viewBox="0 0 64 64" className="w-full h-full" fill="none"><path d="M18 12h16v24h14c4 0 6 4 6 8v8H14V16c0-2 2-4 4-4z" fill={color} stroke="#1F2937" strokeWidth="2"/><path d="M14 52h40v4H14z" fill={sole} stroke="#000" strokeWidth="1"/><path d="M18 16h16" stroke="#FFF" strokeOpacity="0.2"/></svg>;
-
-        const EQUIPMENT_LIST = [
-          { id: 'helmet', name: '工業安全帽', Component: () => <IconHelmet color="#FBBF24"/>, category: 'head', color: 'bg-yellow-400' },
-          { id: 'helmet_electric', name: '電工安全帽', Component: () => <IconHelmet color="#FFFFFF"/>, category: 'head', color: 'bg-white' },
-          { id: 'goggles', name: '安全護目鏡', Component: () => <IconGoggles/>, category: 'eyes', color: 'bg-blue-200' },
-          { id: 'glasses_uv', name: '抗UV防護眼鏡', Component: () => <IconGoggles lens="#4B5563"/>, category: 'eyes', color: 'bg-gray-400' },
-          { id: 'mask_welding', name: '焊接面罩', Component: IconWeldingMask, category: 'eyes', color: 'bg-gray-800' },
-          { id: 'shield_face', name: '防護面罩', Component: IconFaceShield, category: 'eyes', color: 'bg-emerald-200' },
-          { id: 'earmuffs', name: '防音耳罩/耳塞', Component: IconEarmuffs, category: 'ears', color: 'bg-orange-400' },
-          { id: 'mask_gas', name: '防毒面具', Component: IconGasMask, category: 'face', color: 'bg-gray-700' },
-          { id: 'mask_dust', name: '防護口罩', Component: IconN95, category: 'face', color: 'bg-white' },
-          { id: 'harness', name: '高空安全帶', Component: IconHarness, category: 'body_acc', color: 'bg-red-500' },
-          { id: 'lanyard', name: '安全防護索', Component: IconLanyard, category: 'body_acc', color: 'bg-orange-300' },
-          { id: 'vest', name: '反光背心', Component: IconVest, category: 'body', color: 'bg-lime-400' },
-          { id: 'apron', name: '防護圍裙', Component: IconApron, category: 'body_outer', color: 'bg-blue-700' },
-          { id: 'suit_protection', name: 'C級防護衣', Component: IconSuit, category: 'body_full', color: 'bg-white' },
-          { id: 'sleeves_sun', name: '防曬袖套(衣)', Component: IconSleeves, category: 'arms', color: 'bg-blue-300' },
-          { id: 'gloves_cotton', name: '棉紗手套', Component: () => <IconGlove color="#E5E7EB" type="dot"/>, category: 'hands', color: 'bg-gray-200' },
-          { id: 'gloves_rubber', name: '耐化學手套', Component: () => <IconGlove color="#A855F7" type="line"/>, category: 'hands', color: 'bg-purple-500' },
-          { id: 'gloves_insulation', name: '電氣手套', Component: () => <IconGlove color="#EA580C" />, category: 'hands', color: 'bg-orange-600' },
-          { id: 'gloves_cut', name: '五級防割手套', Component: () => <IconGlove color="#94A3B8" type="line"/>, category: 'hands', color: 'bg-slate-400' },
-          { id: 'gloves_leather', name: '皮革手套', Component: () => <IconGlove color="#B45309" />, category: 'hands', color: 'bg-amber-700' },
-          { id: 'gloves_heat', name: '耐熱手套', Component: () => <IconGlove color="#DC2626" />, category: 'hands', color: 'bg-red-600' },
-          { id: 'gloves_cryo', name: '低溫防護手套', Component: () => <IconGlove color="#3B82F6" type="line" />, category: 'hands', color: 'bg-blue-600' },
-          { id: 'safety_shoes', name: '鋼頭安全鞋', Component: () => <IconBoot color="#1F2937" sole="#000"/>, category: 'feet', color: 'bg-slate-800' },
-          { id: 'boots_chem', name: '耐化學鞋', Component: () => <IconBoot color="#CA8A04" sole="#854D0E"/>, category: 'feet', color: 'bg-yellow-600' },
-        ];
-
-        // Group definitions with Icons for Buttons
-        const CATEGORY_GROUPS = [
-            { id: 'head_group', name: '頭部', icon: IconHelmet, categories: ['head', 'ears'] },
-            { id: 'face_group', name: '眼臉', icon: IconGoggles, categories: ['eyes', 'face'] },
-            { id: 'body_group', name: '身體', icon: IconVest, categories: ['body', 'body_acc', 'body_outer', 'body_full'] },
-            { id: 'hand_group', name: '手部', icon: () => <IconGlove color="#A855F7" />, categories: ['hands', 'arms'] },
-            { id: 'foot_group', name: '足部', icon: () => <IconBoot color="#1F2937" sole="#000"/>, categories: ['feet'] },
-        ];
-
-        const SCENARIOS = [
-            { id: 1, title: '燈管更換作業', description: '人員於高處進行燈管更換作業時，應配戴哪些安全防護具？', hint: '「墜落危害」高處作業須防止人員墜落並有防護具保護頭部與腳部', required: ['helmet', 'harness', 'safety_shoes'] },
-            { id: 2, title: '調膠室溶劑調配', description: '進行調膠作業時，應配戴哪些安全防護具？', hint: '「化學危害」需防止吸入有機溶劑氣體並保護眼睛、身體、手部不被化學品噴濺', required: ['mask_gas', 'goggles', 'apron', 'gloves_rubber'] },
-            { id: 3, title: '化調粉體投料作業', description: '化調進行投料作業時，應配戴哪些安全防護具？', hint: '「粉塵危害」需防止粉塵對人體的危害做好保護眼睛及呼吸道', required: ['goggles', 'mask_dust'] },
-            { id: 4, title: '捲料吊掛作業', description: '於吊掛作業區工作時，應配戴哪些安全防護具？', hint: '「飛落物危害」吊掛作業區須防止物體掉落砸傷人員頭部及腳部', required: ['helmet', 'safety_shoes'] },
-            { id: 5, title: '推高機物料搬運作業', description: '駕駛堆高機進行物料搬運作業時，應配戴哪些安全防護具？', hint: '「撞傷/壓傷」駕駛人員除安全帶以外須做好頭部及腳部防護', required: ['helmet', 'safety_shoes'] },
-            { id: 6, title: '電氣室檢修作業', description: '進行電氣設備檢修作業時，應配戴哪些安全防護具？', hint: '「感電危害」電氣設備檢修手部有感電風險須配戴絕緣防護並保護頭部及腳部', required: ['helmet_electric', 'safety_shoes', 'gloves_insulation'] },
-            { id: 7, title: '膜料切割作業', description: '使用刀具進行切割/取膜作業時，應配戴哪些安全防護具？', hint: '「切割危害」避免刀具使用時對手部造成危害', required: ['gloves_cut'] },
-            { id: 8, title: '化學品檢測作業', description: '接觸酸、鹼等腐蝕性化學品時，應配戴哪些安全防護具？', hint: '「噴濺危害」最高規格化學防護保護臉部、呼吸器官、身體及手部', required: ['shield_face', 'mask_dust', 'apron', 'gloves_rubber'] },
-            { id: 9, title: '滾輪清潔作業', description: '進行酒精或IPA擦拭清潔作業時，應配戴哪些安全防護具？', hint: '「化學危害」保護作業人員的眼睛、呼吸道及手部的安全', required: ['goggles', 'mask_dust', 'gloves_rubber'] },
-            { id: 10, title: '化學品分裝(混膠)作業', description: '於進行有機溶劑分裝或化學品混和時，應配戴哪些安全防護具？', hint: '「化學危害」避免眼睛、手部及身體接觸揮發性溶劑且避免吸入揮發性氣體', required: ['goggles', 'gloves_rubber', 'apron', 'mask_gas'] },
-            { id: 11, title: '化學品桶搬運作業', description: '於化學品倉庫以人工搬運桶裝化學品時，應配戴哪些安全防護具？', hint: '「化學/壓傷」防止化學品對眼睛、手部及身體危害及桶身掉落時對腳部的危害', required: ['goggles', 'gloves_rubber', 'safety_shoes', 'apron'] },
-            { id: 12, title: '化學品洩漏初期應變作業', description: '發生化學品洩漏，進行初期處理作業時，應配戴哪些安全防護具？', hint: '「化學危害」須避免呼吸道吸入及對眼睛、手部及身體的危害', required: ['mask_gas', 'goggles', 'gloves_rubber', 'suit_protection', 'boots_chem'] },
-            { id: 13, title: '化學品廢棄物區作業', description: '人員於化學品廢棄物暫存區進行分類檢查時，應配戴哪些安全防護具？', hint: '「化學/壓傷」避免接觸殘留化學物質保護眼睛、手部及身體避免重物壓傷腳部', required: ['goggles', 'gloves_rubber', 'apron', 'boots_chem', 'mask_dust'] },
-            { id: 14, title: '液氮充填分裝作業', description: '進行超低溫液體充填或取樣時，應配戴哪些安全防護具？', hint: '「低溫灼傷」防止極低溫液體噴濺造成凍傷需保護眼睛、手部與身體', required: ['shield_face', 'gloves_cryo', 'apron'] },
-            { id: 15, title: '局限空間作業', description: '進入通風不良之槽體進行清理時，應配戴哪些安全防護具？', hint: '「缺氧/中毒」除通風外需防止吸入有害氣體並確保受困時能被拉出', required: ['mask_gas', 'harness', 'lanyard'] },
-            { id: 16, title: '紫外線/強光操作作業', description: '操作紫外線/強光設備時，應配戴哪些安全防護具？', hint: '「外線/強光」防止特定波長之強光對眼睛造成永久性傷害', required: ['glasses_uv'] },
-            { id: 17, title: '廢棄物清理/資源回收整理', description: '含有尖銳物（如鐵釘、碎玻璃）的廢棄物時，應配戴哪些安全防護具？', hint: '「刺傷危害」防止腳底被刺穿及手部被割傷', required: ['safety_shoes', 'gloves_cut'] },
-            { id: 18, title: '鍋爐加藥作業', description: '人員於鍋爐區進行加藥作業時，應配戴哪些完整安全防護具？', hint: '「化學/壓傷/噪音」注意避免接觸化學物質，保護眼睛、手部及身體，防止重物壓傷腳部，並配戴耳塞', required: ['helmet', 'earmuffs', 'goggles', 'gloves_rubber', 'apron', 'safety_shoes'] },
-            { id: 19, title: '烘箱取物作業', description: '需取出烘箱內之物品時，應配戴哪些安全防護具？', hint: '「高溫危害」 防止手部及身體直接接觸高溫工件或設備造成燙傷', required: ['gloves_heat', 'apron'] },
-            { id: 20, title: '塗頭管件清洗作業', description: '拆除後管件使用有機溶劑進行清洗時，應配戴哪些安全防護具？', hint: '「化學危害」 避免吸入有機溶劑氣體，並防止溶劑噴濺傷及眼睛與皮膚', required: ['mask_gas', 'goggles', 'gloves_rubber', 'apron'] },
-            { id: 21, title: '實驗室滴定作業', description: '使用化學品進行滴定作業時，應配戴哪些完整安全防護具？', hint: '「化學危害」為防止化學品噴濺，應保護眼睛、呼吸道、身體及手部，配戴個人防護具', required: ['goggles', 'mask_dust', 'gloves_rubber', 'apron'] }
-        ];
-
-        const TOTAL_ROUNDS = 10;
-
-        function SafetyGearGame() {
-          const [currentScenario, setCurrentScenario] = useState(null);
-          const [wornItems, setWornItems] = useState([]);
-          const [gameState, setGameState] = useState('start'); // 'start', 'playing', 'success', 'warning' (partial), 'failure', 'result'
-          const [message, setMessage] = useState('');
-          const [failDetails, setFailDetails] = useState(null);
-          const [score, setScore] = useState(0);
-          const [hintVisible, setHintVisible] = useState(false);
-          const [timeMs, setTimeMs] = useState(0);
-          const [isActive, setIsActive] = useState(false);
-          const [saveStatus, setSaveStatus] = useState(null);
-          const [leaderboardData, setLeaderboardData] = useState([]);
-          const [user, setUser] = useState(null);
-          
-          const [round, setRound] = useState(1);
-          const [usedScenarioIds, setUsedScenarioIds] = useState([]);
-          
-          const [departmentId, setDepartmentId] = useState('');
-          const [employeeId, setEmployeeId] = useState('');
-          const [isBlinking, setIsBlinking] = useState(false);
-          const [isTtsLoading, setIsTtsLoading] = useState(false);
-          
-          const audioRef = useRef(null);
-          const [activeGroupId, setActiveGroupId] = useState(CATEGORY_GROUPS[0].id);
-
-          const formatTime = (ms) => (ms / 1000).toFixed(2);
-
-          // Listen for Auth State
-          useEffect(() => {
-              if (window.firebaseServices && window.firebaseServices.auth) {
-                  const unsubscribe = window.firebaseServices.onAuthStateChanged(window.firebaseServices.auth, (u) => {
-                      setUser(u);
-                      if (u) console.log("React: User authenticated", u.uid);
-                  });
-                  return () => unsubscribe();
-              }
-          }, []);
-
-          useEffect(() => {
-            let interval = null;
-            if (isActive) {
-              const startTime = Date.now() - timeMs;
-              interval = setInterval(() => {
-                setTimeMs(Date.now() - startTime);
-              }, 10);
-            }
-            return () => clearInterval(interval);
-          }, [isActive]);
-
-          useEffect(() => {
-            const blinkInterval = setInterval(() => {
-              setIsBlinking(true);
-              setTimeout(() => setIsBlinking(false), 200);
-            }, 4000);
-            return () => clearInterval(blinkInterval);
-          }, []);
-
-          // Save score function
-          const saveScore = async () => {
-             if (window.firebaseServices && window.firebaseServices.db && employeeId && departmentId) {
-                 if (!user) {
-                     console.warn("User not authenticated yet, retrying save in a moment...");
-                     // Small retry logic or just alert
-                     setSaveStatus("error"); 
-                     return;
-                 }
-
-                 setSaveStatus("saving");
-                 try {
-                     const { db, collection, addDoc, serverTimestamp } = window.firebaseServices;
-                     // Use standard path structure for artifacts
-                     await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'scores'), {
-                         departmentId: departmentId,
-                         employeeId: employeeId,
-                         score: score,
-                         timeMs: timeMs,
-                         createdAt: serverTimestamp(),
-                         completedRounds: round >= TOTAL_ROUNDS ? TOTAL_ROUNDS : round
-                     });
-                     setSaveStatus("success");
-                     console.log("Score saved successfully");
-                     fetchLeaderboard(); // Update leaderboard immediately after saving
-                 } catch (e) {
-                     console.error("Error saving score:", e);
-                     setSaveStatus("error");
-                 }
-             }
-          };
-
-          // Fetch Leaderboard
-          const fetchLeaderboard = async () => {
-              if (window.firebaseServices && window.firebaseServices.db) {
-                  try {
-                      const { db, collection, getDocs, query, orderBy, limit } = window.firebaseServices;
-                      
-                      const q = collection(db, 'artifacts', appId, 'public', 'data', 'scores');
-                      const querySnapshot = await getDocs(q);
-                      
-                      const allScores = [];
-                      querySnapshot.forEach((doc) => {
-                          allScores.push({ id: doc.id, ...doc.data() });
-                      });
-
-                      // Process to keep only best score per employeeId
-                      const bestScoresMap = new Map();
-
-                      allScores.forEach(entry => {
-                          const existing = bestScoresMap.get(entry.employeeId);
-                          if (!existing) {
-                              bestScoresMap.set(entry.employeeId, entry);
-                          } else {
-                              // Compare logic: Higher score better, or equal score & lower time better
-                              const isBetterScore = entry.score > existing.score;
-                              const isEqualScoreBetterTime = entry.score === existing.score && entry.timeMs < existing.timeMs;
-                              
-                              if (isBetterScore || isEqualScoreBetterTime) {
-                                  bestScoresMap.set(entry.employeeId, entry);
-                              }
-                          }
-                      });
-
-                      // Convert back to array
-                      const uniqueScores = Array.from(bestScoresMap.values());
-
-                      // Sort final list
-                      uniqueScores.sort((a, b) => {
-                          if (b.score !== a.score) {
-                              return b.score - a.score;
-                          }
-                          return a.timeMs - b.timeMs;
-                      });
-
-                      // Take top 50
-                      setLeaderboardData(uniqueScores.slice(0, 50));
-                      
-                  } catch (e) {
-                      console.error("Error fetching leaderboard:", e);
-                  }
-              }
-          };
-
-          const startGame = () => {
-            setScore(0);
-            setTimeMs(0);
-            setRound(1);
-            setUsedScenarioIds([]);
-            setSaveStatus(null);
-            pickNextLevel([]);
-            setActiveGroupId(CATEGORY_GROUPS[0].id);
-          };
-
-          const pickNextLevel = (currentUsedIds) => {
-            const availableScenarios = SCENARIOS.filter(s => !currentUsedIds.includes(s.id));
-            if (availableScenarios.length === 0) {
-              finishGame();
-              return;
-            }
-            const randomIndex = Math.floor(Math.random() * availableScenarios.length);
-            const nextScenario = availableScenarios[randomIndex];
-            setCurrentScenario(nextScenario);
-            setUsedScenarioIds([...currentUsedIds, nextScenario.id]);
-            setWornItems([]);
-            setGameState('playing');
-            setMessage('');
-            setFailDetails(null);
-            setHintVisible(false);
-            setIsActive(true); 
-            setActiveGroupId(CATEGORY_GROUPS[0].id);
-            if (audioRef.current) {
-                audioRef.current.pause();
-                audioRef.current = null;
-            }
-          };
-
-          const finishGame = () => {
-             setGameState('result');
-             setIsActive(false); 
-             saveScore(); 
-          };
-
-          const nextRound = () => {
-            if (round >= TOTAL_ROUNDS) {
-              finishGame();
-            } else {
-              setRound(r => r + 1);
-              pickNextLevel(usedScenarioIds);
-            }
-          };
-
-          const toggleItem = (item) => {
-            if (gameState !== 'playing') return;
-            setWornItems(prev => {
-              const isWorn = prev.find(i => i.id === item.id);
-              if (isWorn) {
-                return prev.filter(i => i.id !== item.id);
-              } else {
-                // MODIFIED: Allow multiple items for 'body_acc' (Harness + Lanyard), enforce single for others
-                let newItems = prev;
-                if (item.category !== 'body_acc') {
-                     newItems = prev.filter(i => i.category !== item.category);
+        scoreEl.innerText = score;
+        timeEl.innerText = timeLeft;
+        
+        player.x = canvas.width / 2 - player.width / 2;
+        
+        // 啟動倒數計時
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            if (!isGameOver) {
+                timeLeft--;
+                timeEl.innerText = timeLeft;
+                if (timeLeft <= 0) {
+                    gameCompleted(); // 時間到
                 }
-                return [...newItems, item];
-              }
+            }
+        }, 1000);
+    }
+
+    function initBgDecorations() {
+        bgDecorations = [];
+        const count = Math.floor(canvas.width / 150);
+        for (let i = 0; i < count; i++) {
+            bgDecorations.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: 20 + Math.random() * 40,
+                text: Math.random() > 0.5 ? '🐎' : '✨',
+                opacity: 0.1 + Math.random() * 0.2
             });
-          };
+        }
+    }
 
-          const showHint = () => {
-            if (!hintVisible && gameState === 'playing') {
-              setHintVisible(true);
-              setScore(s => s - 20);
-            }
-          };
-          
-          // --- Gemini API Functions ---
-          const fetchGeminiTTS = async () => {
-              if (isTtsLoading) return;
-              setIsTtsLoading(true);
-              
-              const textToRead = `${currentScenario.title}。${currentScenario.description}`;
-              
-              try {
-                  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`, {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({
-                          contents: [{ parts: [{ text: textToRead }] }],
-                          generationConfig: {
-                              responseModalities: ["AUDIO"],
-                              speechConfig: {
-                                  voiceConfig: { prebuiltVoiceConfig: { voiceName: "Kore" } } 
-                              }
-                          }
-                      })
-                  });
-                  const data = await response.json();
-                  const base64Audio = data.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
-                  
-                  if (base64Audio) {
-                      const audioSrc = `data:audio/mp3;base64,${base64Audio}`; 
-                      const audio = new Audio(audioSrc);
-                      audioRef.current = audio;
-                      audio.play();
-                  } else {
-                      // Fallback to browser TTS
-                      const utterance = new SpeechSynthesisUtterance(textToRead);
-                      utterance.lang = 'zh-TW';
-                      window.speechSynthesis.speak(utterance);
-                  }
-              } catch (error) {
-                  console.error("Gemini TTS Error:", error);
-                  const utterance = new SpeechSynthesisUtterance(textToRead);
-                  utterance.lang = 'zh-TW';
-                  window.speechSynthesis.speak(utterance);
-              } finally {
-                  setIsTtsLoading(false);
-              }
-          };
+    function restartGame() {
+        initGame();
+        loop();
+    }
 
-          const checkAnswer = () => {
-            if (!currentScenario) return;
-            setIsActive(false); 
-
-            const requiredIds = currentScenario.required.sort();
-            const wornIds = wornItems.map(i => i.id);
-            const missingItems = requiredIds.filter(id => !wornIds.includes(id));
-            const extraItems = wornIds.filter(id => !requiredIds.includes(id));
-            
-            const requiredNames = requiredIds.map(id => EQUIPMENT_LIST.find(i => i.id === id)?.name);
-            const missingNames = missingItems.map(id => EQUIPMENT_LIST.find(i => i.id === id)?.name);
-            const extraNames = extraItems.map(id => EQUIPMENT_LIST.find(i => i.id === id)?.name);
-
-            const isEntanglementHazard = currentScenario.forbidden && currentScenario.forbidden.includes('hands');
-            const hasGloves = wornItems.some(i => i.category === 'hands');
-            
-            // 1. Check Forbidden (Critical Failure) - 0 Points
-            if (isEntanglementHazard && hasGloves) {
-                setGameState('failure');
-                setMessage('捲夾危害：旋轉機具嚴禁戴手套！');
-                setFailDetails({ type: 'forbidden', text: '旋轉機具禁止戴手套，因為會被捲入機械中造成嚴重傷害。', correctList: requiredNames });
-                return;
-            } 
-            
-            // 2. Check Missing Items (Unsafe) - 0 Points
-            if (missingItems.length > 0) {
-                setGameState('failure');
-                setMessage('防護不完整！');
-                setFailDetails({ type: 'missing', missing: missingNames, correctList: requiredNames });
-                return;
-            }
-
-            // 3. Check Extra Items (Partial Correct) - 50 Points
-            if (extraItems.length > 0) {
-                setGameState('warning'); // Represents partial success
-                setScore(s => s + 50);
-                setMessage('防護足夠但有多餘裝備');
-                setFailDetails({ type: 'extra', extra: extraNames, correctList: requiredNames });
-                return;
-            }
-
-            // 4. Perfect Match - 100 Points
-            setGameState('success');
-            setScore(s => s + 100);
-            setMessage('完美防護！');
-            setFailDetails(null);
-          };
-
-          const countWornInGroup = (group) => {
-             const groupItems = EQUIPMENT_LIST.filter(item => group.categories.includes(item.category));
-             return groupItems.filter(item => wornItems.some(w => w.id === item.id)).length;
-          };
-
-          const WorkerFigure = ({ className = "" }) => {
-            const getItemByCat = (cat) => wornItems.find(i => i.category === cat);
-            const head = getItemByCat('head');
-            const eyes = getItemByCat('eyes'); 
-            const face = getItemByCat('face');
-            const ears = getItemByCat('ears');
-            const body = getItemByCat('body');
-            // MODIFIED: body_acc needs to handle multiple items (Harness AND Lanyard)
-            const bodyAccList = wornItems.filter(i => i.category === 'body_acc');
-            const bodyOuter = getItemByCat('body_outer');
-            const bodyFull = getItemByCat('body_full');
-            const arms = getItemByCat('arms');
-            const hands = getItemByCat('hands');
-            const feet = getItemByCat('feet');
-
-            const breatheClass = gameState === 'playing' ? '' : ''; 
-            
-            // Determine lion mood based on game state
-            const isHappy = gameState === 'success' || gameState === 'warning';
-            
-            return (
-                // Outer wrapper just for positioning in parent flex
-                <div className="flex items-center justify-center">
-                    
-                    {/* Transformed Container (Scale/Translate applies here) */}
-                    <div className={`relative flex flex-col items-center ${className}`}>
-                        
-                        {/* Shadow: Put it here so it scales/moves with lion */}
-                        {/* Positioned at bottom, centered horizontally */}
-                        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-48 h-6 bg-black/20 rounded-[100%] blur-sm z-0"></div>
+    function spawnItem() {
+        // --- 難度控制核心 ---
+        // 隨著時間流逝 (elapsedTime)，速度變得越來越快
+        const elapsedTime = GAME_DURATION - timeLeft;
         
-                        {/* Character Content (Z-index > 0 to stand on shadow) */}
-                        <div className="relative z-10 flex flex-col items-center">
-                            
-                            {/* 阿基獅頭部 */}
-                            <div className={`relative z-30 flex flex-col items-center w-40 h-40 -mb-4 ${breatheClass}`}>
-                                <div className="absolute top-0 left-0 w-full h-full z-0 scale-110">
-                                <svg viewBox="0 0 100 100" className="w-full h-full overflow-visible">
-                                    <circle cx="50" cy="50" r="48" fill="#C27803" stroke="#92400E" strokeWidth="2" />
-                                </svg>
-                                </div>
+        // 1. 生成頻率：時間越少，掉得越密
+        // 初始每 60 幀(約1秒)生成一次，最快每 15 幀(約0.25秒)生成一次
+        const currentSpawnRate = Math.max(15, 60 - Math.floor(elapsedTime * 0.8));
         
-                                {ears && (
-                                <div className="absolute top-8 w-full flex justify-between px-2 z-20 pointer-events-none">
-                                    <div className={`w-5 h-10 ${ears.color} rounded-lg border-2 border-gray-700 shadow-sm -ml-4`}></div>
-                                    <div className={`w-5 h-10 ${ears.color} rounded-lg border-2 border-gray-700 shadow-sm -mr-4`}></div>
-                                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-44 h-12 border-t-4 border-gray-700 rounded-full"></div>
-                                </div>
-                                )}
-        
-                                <div className="relative w-28 h-32 z-10 top-2">
-                                <svg viewBox="0 0 100 120" className="w-full h-full overflow-visible">
-                                    <circle cx="20" cy="10" r="12" fill="#FCD34D" stroke="#C27803" strokeWidth="2" />
-                                    <circle cx="20" cy="10" r="6" fill="#C27803" opacity="0.6" />
-                                    <circle cx="80" cy="10" r="12" fill="#FCD34D" stroke="#C27803" strokeWidth="2" />
-                                    <circle cx="80" cy="10" r="6" fill="#C27803" opacity="0.6" />
-                                    <path d="M 15 40 Q 15 5 50 5 Q 85 5 85 40 L 85 70 Q 85 105 50 105 Q 15 105 15 70 Z" fill="#FCD34D" stroke="#C27803" strokeWidth="2" />
-                                    <path d="M 30 45 Q 38 35 46 45" stroke="#1F2937" strokeWidth="4" fill="none" strokeLinecap="round" />
-                                    <path d="M 54 45 Q 62 35 70 45" stroke="#1F2937" strokeWidth="4" fill="none" strokeLinecap="round" />
-                                    <path d="M 20 60 Q 50 55 80 60" stroke="#C27803" strokeWidth="1" fill="none" opacity="0.3" />
-                                    <path d="M 35 60 Q 50 50 65 60 Q 70 70 50 75 Q 30 70 35 60" fill="#000" />
-                                    <ellipse cx="45" cy="58" rx="6" ry="3" fill="white" opacity="0.9" transform="rotate(-15 45 58)"/>
-                                    <path d="M 50 75 L 50 85" stroke="#000" strokeWidth="1.5" />
-                                    <path d="M 30 85 Q 50 105 70 85 Q 50 85 30 85" fill="#7F1D1D" />
-                                    {/* Smile depends on isHappy */}
-                                    {isHappy 
-                                        ? <path d="M 40 95 Q 50 105 60 95" fill="none" stroke="#F472B6" strokeWidth="3" /> 
-                                        : <path d="M 40 95 Q 50 90 60 95" fill="#F472B6" /> 
-                                    }
-                                </svg>
-        
-                                {/* 裝備層 */}
-                                {eyes && (
-                                    <div className="absolute top-8 left-1/2 -translate-x-1/2 z-50">
-                                    {(eyes.id === 'goggles' || eyes.id === 'glasses_uv') && <div className={`w-32 h-14 ${eyes.color} opacity-80 border-4 border-gray-600 rounded-xl backdrop-blur-sm shadow-md`}></div>}
-                                    {eyes.id === 'mask_welding' && <div className="w-36 h-40 -mt-12 bg-gray-800 rounded-3xl border-2 border-gray-600 flex items-center justify-center shadow-lg"><div className="w-24 h-12 bg-black border-2 border-yellow-500 rounded"></div></div>}
-                                    {eyes.id === 'shield_face' && <div className={`w-36 h-40 -mt-10 ${eyes.color} opacity-60 border-t-4 border-gray-500 rounded-3xl backdrop-blur-sm shadow-sm`}></div>}
-                                    </div>
-                                )}
-                                {face && (
-                                    <div className={`absolute bottom-[-10px] left-1/2 -translate-x-1/2 w-28 h-20 ${face.color} rounded-b-[2rem] rounded-t-lg border border-gray-400 z-40 flex items-center justify-center shadow-sm`}>
-                                    {face.id === 'mask_gas' && <div className="flex gap-2"><div className="w-8 h-8 bg-gray-800 rounded-full border-2 border-gray-500"></div><div className="w-8 h-8 bg-gray-800 rounded-full border-2 border-gray-500"></div></div>}
-                                    {face.id === 'mask_dust' && <div className="w-12 h-10 bg-white rounded-full border border-gray-200 opacity-50"></div>}
-                                    </div>
-                                )}
-                                {head && (
-                                    <div className={`absolute -top-16 left-1/2 -translate-x-1/2 w-44 h-24 ${head.color} rounded-t-full border-b-4 border-gray-700 shadow-md z-50 flex items-center justify-center`}>
-                                    <div className="w-32 h-2 bg-black/10 rounded-full mt-14"></div>
-                                    <div className="absolute top-4 w-full text-center text-[10px] font-bold text-black/30">SAFETY FIRST</div>
-                                    </div>
-                                )}
-                                </div>
-                            </div>
-        
-                            {/* 身體 (Purple) */}
-                            <div className="relative z-20 -mt-2">
-                                <div className={`absolute -left-8 top-6 w-10 h-32 bg-[#FCD34D] rounded-full origin-top transform rotate-12 border-2 border-[#C27803] flex flex-col justify-end items-center z-0 transition-transform ${isHappy ? '-rotate-[140deg] -translate-x-4' : ''}`}></div>
-                                <div className={`absolute -right-8 top-6 w-10 h-32 bg-[#FCD34D] rounded-full origin-top transform -rotate-12 border-2 border-[#C27803] flex flex-col justify-end items-center z-0 transition-transform ${isHappy ? 'rotate-[140deg] translate-x-4' : ''}`}></div>
+        if (frameCount % currentSpawnRate === 0) {
+            const r = Math.random() * 100;
+            let selectedType = ITEM_TYPES.RED_PACKET;
+
+            // 炸彈機率隨分數和時間微幅增加
+            let bombChanceAdd = Math.min(25, Math.floor(score / 100) + Math.floor(elapsedTime / 5)); 
             
-                                <div className="w-40 h-44 bg-purple-800 rounded-[2rem] relative z-10 border-2 border-purple-900 overflow-hidden flex items-center justify-center shadow-inner">
-                                <div className="w-1 h-full bg-black/20"></div>
-                                <div className="absolute top-10 left-10 opacity-40 text-white"><Building2 size={20}/></div>
-                                {body && <div className={`absolute inset-0 w-full h-full ${body.color} flex flex-col items-center`}><div className="w-full h-full border-x-8 border-orange-500/50"></div></div>}
-                                {bodyFull && <div className={`absolute inset-0 w-full h-full ${bodyFull.color} rounded-[2rem] border-2 border-gray-300 flex flex-col items-center justify-center`}><div className="w-1 h-full bg-gray-200"></div></div>}
-                                {bodyOuter && <div className={`absolute inset-0 top-4 mx-2 h-full ${bodyOuter.color} rounded-b-lg border-2 border-white/20 shadow-lg`}><div className="absolute -top-4 left-1/2 -translate-x-1/2 w-20 h-4 bg-inherit border-x-2 border-t-2 border-white/20"></div></div>}
-                                {bodyAccList.map(acc => (
-                                    <div key={acc.id} className="absolute inset-0 w-full h-full pointer-events-none">
-                                        {acc.id === 'harness' && <><div className="absolute top-10 left-0 w-full h-3 bg-red-600 shadow-sm"></div><div className="absolute top-0 left-8 w-3 h-full bg-red-600 shadow-sm"></div><div className="absolute top-0 right-8 w-3 h-full bg-red-600 shadow-sm"></div></>}
-                                        {acc.id === 'lanyard' && <div className="absolute top-6 right-4 w-4 h-32 bg-orange-400 rotate-12 rounded-full border-2 border-orange-600"></div>}
-                                    </div>
-                                ))}
-                                </div>
-            
-                                {/* Arms/Sleeves */}
-                                {arms && (
-                                    <>
-                                        <div className={`absolute -left-9 top-10 w-12 h-32 ${arms.color} rounded-full origin-top transform rotate-12 z-5`}></div>
-                                        <div className={`absolute -right-9 top-10 w-12 h-32 ${arms.color} rounded-full origin-top transform -rotate-12 z-5`}></div>
-                                    </>
-                                )}
-            
-                                {hands && (
-                                <>
-                                    <div className={`absolute -left-10 top-32 w-14 h-16 ${hands.color} rounded-xl border-2 border-gray-600 shadow-sm z-20 transform rotate-12 ${isHappy ? 'top-[-50px] -left-[90px]' : ''}`}></div>
-                                    <div className={`absolute -right-10 top-32 w-14 h-16 ${hands.color} rounded-xl border-2 border-gray-600 shadow-sm z-20 transform -rotate-12 ${isHappy ? 'top-[-50px] -right-[90px]' : ''}`}></div>
-                                </>
-                                )}
-                            </div>
-        
-                            {/* 腿部 */}
-                            <div className="flex gap-1 -mt-4 z-10">
-                                <div className="w-16 h-32 bg-slate-800 rounded-b-lg border-2 border-slate-900 relative flex justify-center shadow-lg">
-                                    {bodyFull && <div className="absolute inset-0 bg-white rounded-b-lg opacity-90"></div>}
-                                {feet ? <div className={`absolute -bottom-2 w-20 h-12 left-1/2 -translate-x-1/2 ${feet.color} rounded-lg border-b-4 border-black z-20`}></div> : <div className="absolute -bottom-2 w-18 h-10 bg-black rounded-lg z-20"></div>}
-                                </div>
-                                <div className="w-16 h-32 bg-slate-800 rounded-b-lg border-2 border-slate-900 relative flex justify-center shadow-lg">
-                                    {bodyFull && <div className="absolute inset-0 bg-white rounded-b-lg opacity-90"></div>}
-                                {feet ? <div className={`absolute -bottom-2 w-20 h-12 left-1/2 -translate-x-1/2 ${feet.color} rounded-lg border-b-4 border-black z-20`}></div> : <div className="absolute -bottom-2 w-18 h-10 bg-black rounded-lg z-20"></div>}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            );
-          };
+            if (r < 60 - bombChanceAdd) selectedType = ITEM_TYPES.RED_PACKET;
+            else if (r < 80 - bombChanceAdd) selectedType = ITEM_TYPES.INGOT;
+            else selectedType = Math.random() > 0.5 ? ITEM_TYPES.BOMB : ITEM_TYPES.FIRECRACKER;
 
-          // --- 主畫面渲染 ---
-          if (gameState === 'start' || gameState === 'result') {
-            return (
-              <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 relative overflow-hidden">
-                {/* Decorative Background */}
-                <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-br from-benq to-purple-800 rounded-b-[3rem] shadow-2xl z-0"></div>
-                <div className="absolute top-10 left-10 w-32 h-32 bg-white/10 rounded-full blur-2xl z-0"></div>
-                <div className="absolute top-20 right-10 w-48 h-48 bg-white/10 rounded-full blur-3xl z-0"></div>
+            // 2. 掉落速度：隨時間顯著變快
+            // 基礎倍率為 1，時間快結束時接近 2.5倍速
+            const timeSpeedMultiplier = 1 + (elapsedTime / GAME_DURATION) * 1.5;
 
-                <div className="w-full max-w-md bg-white rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] overflow-hidden relative z-10 animate-fade-in flex flex-col max-h-[90vh]">
-                    {/* Header Section */}
-                    <div className="bg-white p-8 pb-4 text-center shrink-0">
-                        <div className="inline-flex items-center justify-center w-16 h-16 bg-purple-50 text-benq rounded-2xl mb-4 shadow-inner">
-                            <Building2 size={32} />
-                        </div>
-                        <h1 className="text-2xl font-black text-slate-800 tracking-tight mb-1">BenQ Materials</h1>
-                        <div className="text-benq font-bold text-3xl tracking-wider uppercase mb-2">工安防護具大挑戰</div>
-                    </div>
+            const size = 40;
+            items.push({
+                x: Math.random() * (canvas.width - size),
+                y: -50,
+                size: size,
+                ...selectedType,
+                speed: selectedType.speedBase * timeSpeedMultiplier
+            });
+        }
+    }
 
-                    {/* Form Section / Result Section */}
-                    <div className="p-8 pt-0 space-y-4 overflow-y-auto flex-1 custom-scrollbar">
-                        {gameState === 'result' ? (
-                             <div className="w-full flex flex-col gap-4">
-                                <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
-                                   <div className="flex justify-between items-center mb-4 border-b border-slate-200 pb-4">
-                                        <div>
-                                          <div className="text-xs text-slate-400">總得分</div>
-                                          <div className="text-2xl font-black text-benq">{score}</div>
-                                        </div>
-                                        <div className="text-right">
-                                          <div className="text-xs text-slate-400">總耗時</div>
-                                          <div className="text-2xl font-black text-orange-500">{formatTime(timeMs)}s</div>
-                                        </div>
-                                   </div>
-                                   <div className="bg-white p-3 rounded-lg border border-slate-200 shadow-sm mb-2 text-sm">
-                                        <div className="flex justify-between mb-1">
-                                            <span className="text-slate-500 font-bold">部門代號：</span>
-                                            <span className="font-bold text-slate-700">{departmentId}</span>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <span className="text-slate-500 font-bold">參賽工號：</span>
-                                            <span className="font-bold text-slate-700">{employeeId}</span>
-                                        </div>
-                                   </div>
-                                   {saveStatus === 'success' && <div className="text-center text-xs text-emerald-600 font-bold">✓ 成績已上傳</div>}
-                                   {saveStatus === 'error' && <div className="text-center text-xs text-red-500 font-bold">⚠️ 上傳失敗</div>}
-                                </div>
+    function update() {
+        if (isGameOver) return;
 
-                                {/* Leaderboard Section */}
-                                <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                                    <div className="bg-purple-50 p-3 border-b border-purple-100 flex items-center gap-2">
-                                        <Trophy size={16} className="text-yellow-500"/>
-                                        <span className="font-bold text-slate-700">🏆 防護具達人</span>
-                                    </div>
-                                    <div className="max-h-60 overflow-y-auto custom-scrollbar">
-                                        <table className="leaderboard-table">
-                                            <thead>
-                                                <tr>
-                                                    <th>排名</th>
-                                                    <th>部門</th>
-                                                    <th>工號</th>
-                                                    <th>分數</th>
-                                                    <th>耗時</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {leaderboardData.length > 0 ? (
-                                                    leaderboardData.map((data, index) => (
-                                                        <tr key={data.id} className={data.employeeId === employeeId && data.score === score && data.timeMs === timeMs ? "highlight" : ""}>
-                                                            <td className={`text-center ${index === 0 ? 'rank-1' : index === 1 ? 'rank-2' : index === 2 ? 'rank-3' : ''}`}>
-                                                                {index + 1}
-                                                            </td>
-                                                            <td>{data.departmentId}</td>
-                                                            <td>{data.employeeId}</td>
-                                                            <td className="font-bold text-benq">{data.score}</td>
-                                                            <td className="text-slate-500 text-xs">{formatTime(data.timeMs)}s</td>
-                                                        </tr>
-                                                    ))
-                                                ) : (
-                                                    <tr>
-                                                        <td colSpan="5" className="text-center text-slate-400 py-4">暫無資料...</td>
-                                                    </tr>
-                                                )}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                                
-                                <button onClick={() => setGameState('start')} className="w-full bg-slate-200 text-slate-600 py-3 rounded-xl font-bold flex justify-center gap-2 items-center active:scale-95 transition-transform"><RotateCcw size={18}/> 回首頁</button>
-                             </div>
-                        ) : (
-                            <div className="space-y-4">
-                                <p className="text-center text-slate-500 mb-2 text-sm">請輸入您的資訊開始挑戰！</p>
-                                
-                                <div className="space-y-3">
-                                    <div className="relative group">
-                                        <div className="absolute left-4 top-3.5 text-slate-400 group-focus-within:text-benq transition-colors"><Building2 size={20} /></div>
-                                        <input 
-                                            type="text" 
-                                            placeholder="請輸入部門代號" 
-                                            className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-slate-200 font-bold outline-none focus:border-benq transition-colors bg-slate-50 focus:bg-white text-lg text-center" 
-                                            value={departmentId} 
-                                            onChange={(e) => setDepartmentId(e.target.value)} 
-                                        />
-                                    </div>
-                                    <div className="relative group">
-                                        <div className="absolute left-4 top-3.5 text-slate-400 group-focus-within:text-benq transition-colors"><UserCheck size={20} /></div>
-                                        <input 
-                                            type="text" 
-                                            placeholder="請輸入工號" 
-                                            className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-slate-200 font-bold outline-none focus:border-benq transition-colors bg-slate-50 focus:bg-white text-lg text-center" 
-                                            value={employeeId} 
-                                            onChange={(e) => setEmployeeId(e.target.value)} 
-                                        />
-                                    </div>
-                                </div>
-
-                                <button onClick={startGame} disabled={!employeeId || !departmentId} className="w-full bg-benq hover:bg-purple-800 text-white py-4 rounded-2xl font-bold shadow-lg shadow-purple-200 active:scale-95 transition-all flex items-center justify-center gap-2 mt-4 disabled:opacity-50 disabled:cursor-not-allowed">
-                                    開始挑戰 <ArrowRight size={20} />
-                                </button>
-
-                                <div className="mt-4 bg-purple-50 rounded-xl p-4 text-sm text-slate-600 border border-purple-100">
-                                    <div className="font-bold text-benq flex items-center gap-2 mb-2">
-                                        <Trophy size={16} /> 評分與排名機制
-                                    </div>
-                                    <ul className="list-disc list-inside space-y-1 text-xs">
-                                        <li>完美防護：每答對一題獲得 <span className="font-bold text-slate-800">100</span> 分</li>
-                                        <li>部分正確：多餘裝備獲得 <span className="font-bold text-orange-600">50</span> 分</li>
-                                        <li>嚴重違規/不完整：<span className="font-bold text-red-500">0</span> 分</li>
-                                        <li>扣分：每次使用提示扣 <span className="font-bold text-red-500">20</span> 分</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                    
-                    {/* Footer Decoration */}
-                    <div className="h-2 bg-gradient-to-r from-benq to-purple-400 w-full shrink-0"></div>
-                </div>
-            </div>
-            );
-          }
-
-          // --- 手機版主要佈局 ---
-          return (
-            <div className="h-full flex flex-col overflow-hidden bg-slate-50">
-                {/* 1. Header (Fixed) */}
-                <div className="flex-none bg-white shadow-sm z-20 flex justify-between items-center px-4 py-2 border-b border-slate-100">
-                     <div className="flex items-center gap-2">
-                        <span className="bg-purple-100 text-purple-700 px-2 py-0.5 rounded text-xs font-bold">Q{round}/{TOTAL_ROUNDS}</span>
-                        <div className="font-mono font-bold text-orange-500 flex gap-1 items-center text-xs"><History size={12}/> {formatTime(timeMs)}s</div>
-                     </div>
-                     <div className="font-black text-benq text-lg">{score}</div>
-                </div>
-
-                {/* 2. Top Section: Question & Lion (Fixed Height Split View) */}
-                <div className="flex w-full h-[35vh] border-b border-slate-200 shrink-0 bg-white min-h-[200px]">
-                    {/* Left: Question Area (Expanded to 2/3 width) */}
-                    <div className="w-2/3 p-4 flex flex-col border-r border-slate-100 bg-slate-50 overflow-y-auto">
-                         {/* Title */}
-                         <div className="flex justify-between items-start mb-2">
-                            <h1 className="font-bold text-slate-800 text-lg leading-tight">{currentScenario?.title}</h1>
-                            <button 
-                                onClick={fetchGeminiTTS} 
-                                disabled={isTtsLoading}
-                                className={`p-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 transition-all ${isTtsLoading ? 'opacity-50 animate-pulse' : ''}`}
-                                title="朗讀題目"
-                            >
-                                <Volume2 size={16}/>
-                            </button>
-                         </div>
-                         
-                         {/* Hint & Count Row */}
-                         <div className="flex flex-wrap items-center gap-2 mb-2">
-                             {!hintVisible ? (
-                                <button onClick={showHint} className="flex items-center gap-1 text-xs font-bold text-amber-600 bg-amber-100 px-2 py-1 rounded-full border border-amber-200 active:scale-95 whitespace-nowrap"><Lightbulb size={12}/> 點選提示</button>
-                            ) : (
-                                <div className="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded border border-amber-100 animate-fade-in">{currentScenario?.hint}</div>
-                            )}
-                            
-                            {/* Item Count Hint moved here */}
-                            {currentScenario && (
-                                <div className="flex items-center gap-1 text-xs font-bold text-slate-500 bg-slate-100 px-2 py-1 rounded-lg whitespace-nowrap">
-                                    <Info size={12} className="text-benq"/>
-                                    <span>應選 <span className="text-benq text-sm mx-0.5">{currentScenario.required.length}</span> 項</span>
-                                </div>
-                            )}
-                         </div>
-
-                         <p className="text-base text-slate-600 leading-snug">{currentScenario?.description}</p>
-                    </div>
-
-                    {/* Right: Character Area (Narrower 1/3 width) */}
-                    <div className="w-1/3 relative bg-gradient-to-b from-white to-slate-100 flex justify-center items-center pb-0 overflow-hidden">
-                         <WorkerFigure className="scale-[0.45] sm:scale-75" />
-                    </div>
-                </div>
-
-                {/* 3. Bottom Section: Tabs + Equipment Grid (Flex 1) */}
-                <div className="flex-1 flex flex-col min-h-0 bg-white">
-                    {/* Category Tabs */}
-                    <div className="flex-none p-2 border-b border-slate-100 bg-white shadow-sm z-10">
-                         <div className="grid grid-cols-5 gap-1">
-                            {CATEGORY_GROUPS.map((group) => {
-                                const Icon = group.icon;
-                                const count = countWornInGroup(group);
-                                const isActive = activeGroupId === group.id;
-                                
-                                return (
-                                    <button 
-                                        key={group.id} 
-                                        onClick={() => setActiveGroupId(group.id)}
-                                        disabled={gameState !== 'playing'}
-                                        className={`relative flex flex-col items-center justify-center py-1.5 rounded-lg transition-all active:scale-95
-                                        ${isActive ? 'bg-benq text-white shadow-md' : 'bg-slate-50 text-slate-500 hover:bg-slate-100'}`}
-                                    >
-                                                {count > 0 && (
-                                                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold border border-white shadow-sm">
-                                                        {count}
-                                                    </span>
-                                                )}
-                                                <Icon size={12} />
-                                                <span className="text-[10px] font-bold mt-0">{group.name}</span>
-                                    </button>
-                                )
-                            })}
-                         </div>
-                    </div>
-
-                    {/* Equipment Grid (Scrollable) */}
-                    <div className="flex-1 overflow-y-auto p-4 custom-scrollbar bg-slate-50 pb-24">
-                         <div className="grid grid-cols-4 gap-3 animate-fade-in" key={activeGroupId}>
-                             {EQUIPMENT_LIST
-                                .filter(item => CATEGORY_GROUPS.find(g => g.id === activeGroupId)?.categories.includes(item.category))
-                                .map((item) => {
-                                    const isWorn = wornItems.find(i => i.id === item.id);
-                                    const Icon = item.Component;
-                                    return (
-                                        <button key={item.id} onClick={() => toggleItem(item)} disabled={gameState !== 'playing'}
-                                            className={`relative flex flex-col items-center p-1.5 rounded-xl border-2 transition-all active:scale-95 h-20 justify-between
-                                            ${isWorn ? 'bg-purple-50 border-benq shadow-md' : 'bg-white border-slate-200'}`}
-                                        >
-                                            {isWorn && <div className="absolute top-1 right-1 text-benq"><CheckCircle size={14}/></div>}
-                                            <div className="w-5 h-5 flex items-center justify-center mt-0.5"><Icon /></div>
-                                            <div className="text-[10px] font-bold text-slate-600 text-center leading-tight w-full line-clamp-2 mt-0.5">{item.name}</div>
-                                        </button>
-                                    )
-                                })}
-                         </div>
-                    </div>
-                </div>
-
-                {/* 4. Footer Actions (Fixed) */}
-                <div className="flex-none bg-white px-4 py-3 border-t border-slate-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-30 pb-safe">
-                    <div className="max-w-md mx-auto flex gap-2">
-                        <button onClick={() => setWornItems([])} className="p-3 rounded-xl bg-slate-100 text-slate-500 border border-slate-300 active:scale-95"><RotateCcw size={18}/></button>
-                        {gameState === 'playing' ? (
-                            <button onClick={checkAnswer} className="flex-1 bg-benq hover:bg-benq-dark text-white font-bold rounded-xl py-3 shadow-lg shadow-purple-200 active:scale-95 transition-transform flex justify-center items-center gap-2 text-sm">
-                                確認裝備 <CheckCircle size={16}/>
-                            </button>
-                        ) : (
-                            <button onClick={nextRound} className="flex-1 bg-blue-600 text-white font-bold rounded-xl py-3 shadow-lg shadow-blue-200 active:scale-95 transition-transform flex justify-center items-center gap-2 text-sm">
-                                {round >= TOTAL_ROUNDS ? '查看結果' : '下一題'} <ArrowRight size={16}/>
-                            </button>
-                        )}
-                    </div>
-                </div>
-
-                {/* 結果彈窗 (Overlay) */}
-                {message && gameState !== 'playing' && gameState !== 'leaderboard' && gameState !== 'result' && (
-                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white/95 backdrop-blur shadow-2xl border-2 border-slate-100 rounded-2xl p-6 w-4/5 max-h-[85vh] overflow-y-auto custom-scrollbar text-center z-50 animate-fade-in flex flex-col">
-                        <div className={`text-xl font-black mb-2 
-                            ${gameState === 'success' ? 'text-green-500' : 
-                              gameState === 'warning' ? 'text-amber-500' : 'text-red-500'}`}>
-                            {gameState === 'success' ? '完美防護！' : 
-                             gameState === 'warning' ? '部分正確！' : '哎呀...'}
-                        </div>
-                        <p className="text-sm text-slate-600 font-bold mb-4">{message}</p>
-                        
-                        {/* 顯示正確/錯誤詳情區域 */}
-                        {failDetails && (
-                            <div className={`rounded-xl p-3 text-left border text-xs mb-3 
-                                ${gameState === 'success' ? 'bg-green-50 border-green-100' : 
-                                  gameState === 'warning' ? 'bg-amber-50 border-amber-100' : 'bg-red-50 border-red-100'}`}>
-                                
-                                {failDetails.type === 'missing' && failDetails.missing && failDetails.missing.length > 0 && (
-                                    <div className="mb-2">
-                                        <div className="font-bold text-red-500 flex items-center gap-1 mb-1"><AlertTriangle size={12}/> 缺少裝備：</div>
-                                        <div className="text-slate-700 pl-4">{failDetails.missing.join('、')}</div>
-                                    </div>
-                                )}
-                                
-                                {failDetails.type === 'extra' && failDetails.extra && failDetails.extra.length > 0 && (
-                                    <div className="mb-2">
-                                        <div className="font-bold text-amber-600 flex items-center gap-1 mb-1"><Info size={12}/> 多餘裝備：</div>
-                                        <div className="text-slate-700 pl-4">{failDetails.extra.join('、')}</div>
-                                    </div>
-                                )}
-
-                                {failDetails.type === 'forbidden' && (
-                                    <div className="mb-2 text-red-600 font-bold">
-                                        {failDetails.text}
-                                    </div>
-                                )}
-                                
-                                <div className="mt-2 pt-2 border-t border-slate-200/50">
-                                    <div className="font-bold text-emerald-600 flex items-center gap-1 mb-1"><CheckCircle size={12}/> 正確配置：</div>
-                                    <div className="text-slate-700 pl-4">{failDetails.correctList.join('、')}</div>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                )}
-            </div>
-          );
+        // 玩家移動
+        if (player.isMovingLeft) {
+            player.x -= player.speed;
+            if (player.x < 0) player.x = 0;
+        }
+        if (player.isMovingRight) {
+            player.x += player.speed;
+            if (player.x > canvas.width - player.width) player.x = canvas.width - player.width;
         }
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<SafetyGearGame />);
-    </script>
+        // 更新掉落物
+        for (let i = items.length - 1; i >= 0; i--) {
+            let item = items[i];
+            item.y += item.speed;
+
+            if (
+                item.x < player.x + player.width &&
+                item.x + item.size > player.x &&
+                item.y < player.y + player.height &&
+                item.y + item.size > player.y + player.height * 0.2
+            ) {
+                if (item.type === 'good') {
+                    score += item.score;
+                    scoreEl.innerText = score;
+                    createParticle(item.x, item.y, `+${item.score}`, '#FFFF00');
+                    items.splice(i, 1);
+                } else {
+                    gameOver(); // 炸彈爆炸
+                }
+            } else if (item.y > canvas.height) {
+                items.splice(i, 1);
+            }
+        }
+
+        // 更新粒子
+        for (let i = particles.length - 1; i >= 0; i--) {
+            let p = particles[i];
+            p.y -= 1;
+            p.life--;
+            if (p.life <= 0) particles.splice(i, 1);
+        }
+
+        frameCount++;
+        spawnItem();
+    }
+
+    function createParticle(x, y, text, color) {
+        particles.push({
+            x: x,
+            y: y,
+            text: text,
+            color: color,
+            life: 40
+        });
+    }
+
+    // 時間到的結束 (Good Ending)
+    function gameCompleted() {
+        isGameOver = true;
+        isTimeUp = true;
+        clearInterval(timerInterval);
+        cancelAnimationFrame(animationId);
+        draw();
+    }
+
+    // 炸彈結束 (Bad Ending)
+    function gameOver() {
+        isGameOver = true;
+        isTimeUp = false;
+        clearInterval(timerInterval);
+        cancelAnimationFrame(animationId);
+        draw();
+    }
+
+    // --- 繪圖邏輯 ---
+
+    function draw() {
+        let gradient = ctx.createRadialGradient(canvas.width/2, canvas.height/2, 100, canvas.width/2, canvas.height/2, canvas.height);
+        gradient.addColorStop(0, '#B22222');
+        gradient.addColorStop(1, '#500000');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.save();
+        bgDecorations.forEach(bg => {
+            ctx.globalAlpha = bg.opacity;
+            ctx.font = `${bg.size}px Arial`;
+            ctx.fillStyle = "#FFD700";
+            ctx.fillText(bg.text, bg.x, bg.y);
+        });
+        ctx.restore();
+
+        items.forEach(item => {
+            ctx.font = `${item.size}px Arial`;
+            ctx.fillText(item.emoji, item.x, item.y + item.size);
+        });
+
+        drawPlayer();
+
+        particles.forEach(p => {
+            ctx.fillStyle = p.color;
+            ctx.font = "bold 24px Arial";
+            ctx.fillText(p.text, p.x, p.y);
+        });
+
+        if (isGameOver) {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.textAlign = 'center';
+            
+            if (isTimeUp) {
+                // 時間到的顯示
+                ctx.fillStyle = '#FFD700';
+                ctx.font = 'bold 50px Microsoft JhengHei';
+                ctx.fillText('🎊 恭喜發財 🎊', canvas.width / 2, canvas.height / 2 - 60);
+                
+                ctx.font = '30px Microsoft JhengHei';
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fillText('時間結束！荷包滿滿！', canvas.width / 2, canvas.height / 2);
+            } else {
+                // 炸彈的顯示
+                ctx.fillStyle = '#FF4500'; // 橘紅色
+                ctx.font = 'bold 50px Microsoft JhengHei';
+                ctx.fillText('💥 歲歲平安 💥', canvas.width / 2, canvas.height / 2 - 60);
+                
+                ctx.font = '30px Microsoft JhengHei';
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fillText('小心炸彈！下次再來！', canvas.width / 2, canvas.height / 2);
+            }
+            
+            ctx.font = '40px Microsoft JhengHei';
+            ctx.fillStyle = '#FFD700';
+            ctx.fillText(`最終得分: ${score}`, canvas.width / 2, canvas.height / 2 + 60);
+            
+            ctx.font = '24px Microsoft JhengHei';
+            ctx.fillStyle = '#AAAAAA';
+            ctx.fillText('點擊畫面重新開始', canvas.width / 2, canvas.height / 2 + 110);
+            
+            ctx.textAlign = 'start';
+        }
+    }
+
+    function drawPlayer() {
+        const p = player;
+        const x = p.x;
+        const y = p.y;
+        const w = p.width;
+        const h = p.height;
+
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x + w, y);
+        ctx.lineTo(x + w * 0.8, y + h);
+        ctx.lineTo(x + w * 0.2, y + h);
+        ctx.closePath();
+        
+        const goldGradient = ctx.createLinearGradient(x, y, x, y + h);
+        goldGradient.addColorStop(0, '#FFD700');
+        goldGradient.addColorStop(1, '#DAA520');
+        ctx.fillStyle = goldGradient;
+        ctx.fill();
+        
+        ctx.strokeStyle = '#B8860B';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        ctx.fillStyle = '#CC0000';
+        ctx.font = `bold ${h * 0.6}px Microsoft JhengHei`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('福', x + w / 2, y + h / 2 + 2);
+
+        ctx.textAlign = 'start';
+        ctx.textBaseline = 'alphabetic';
+    }
+
+    function loop() {
+        if (!isGameOver) {
+            update();
+            draw();
+            animationId = requestAnimationFrame(loop);
+        }
+    }
+
+</script>
+
 </body>
 </html>
