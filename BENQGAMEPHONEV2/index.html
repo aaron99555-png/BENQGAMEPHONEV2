@@ -1,421 +1,885 @@
+
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>馬年接紅包 - 鴻運當頭</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            background-color: #800000; /* 深紅色背景 */
-            font-family: "Microsoft JhengHei", "Heiti TC", sans-serif;
-            touch-action: none; /* 防止手機上下滑動 */
-        }
-        canvas {
-            display: block;
-        }
-        #ui-layer {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            right: 20px;
-            display: flex;
-            justify-content: space-between;
-            color: #FFD700; /* 金色 */
-            font-size: 24px;
-            font-weight: bold;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-            pointer-events: none;
-        }
-    </style>
+<script>if(location.hostname.endsWith('pages.dev')){document.addEventListener('DOMContentLoaded',function(){var d=document.body;while(d.firstChild)d.removeChild(d.firstChild);d.style.cssText='display:flex;align-items:center;justify-content:center;min-height:100vh;background:#0d1117;color:#e6edf3;font-family:sans-serif;text-align:center;padding:20px';var w=document.createElement('div');var h=document.createElement('h1');h.style.cssText='font-size:2em;margin-bottom:12px';h.textContent='🐰 Chengwaye 已搬家';w.appendChild(h);var p=document.createElement('p');p.style.cssText='font-size:1.2em;color:#8b949e;margin-bottom:24px';p.textContent='本站已遷移至新網址，請更新您的書籤';w.appendChild(p);var a=document.createElement('a');a.href='https://chengwaye.com'+location.pathname+location.search;a.style.cssText='display:inline-block;padding:12px 32px;background:#2ea043;color:#fff;border-radius:8px;font-size:1.1em;text-decoration:none';a.textContent='前往 chengwaye.com →';w.appendChild(a);d.appendChild(w);});}</script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y9YL64EWJ4"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-Y9YL64EWJ4');</script>
+<script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "b34ec9baf19a484084ee727c603d61c8"}'></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4394676027529562" crossorigin="anonymous"></script>
+<title>台股漲停股AI族群分類 2026/03/23 — 券商分點買賣超排行 | Chengwaye</title>
+<meta name="description" content="2026/03/23 台股漲停股AI智能族群分類，法人三大籌碼，券商分點買賣超前15大排行，主力動向泡泡圖，每日收盤自動更新">
+<meta name="keywords" content="台股漲停,漲停股,AI分類,族群分類,券商分點,買賣超,法人籌碼,主力動向,泡泡圖">
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #0d1117; color: #e6edf3; font-family: -apple-system, 'Segoe UI', sans-serif; }
+.container { max-width: 1200px; margin: 0 auto; padding: 16px; }
+.container.wide { max-width: 1200px; }
+header { text-align: center; padding: 16px 0 12px; border-bottom: 1px solid #30363d; margin-bottom: 16px; position: relative; }
+header h1 { font-size: 22px; margin-bottom: 2px; }
+header h1 span.rabbit { font-size: 26px; }
+header .subtitle { color: #8b949e; font-size: 13px; }
+
+/* Date navigation */
+.date-nav { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 8px; }
+.date-nav .date { font-size: 14px; color: #e6edf3; font-weight: 600; min-width: 100px; }
+.date-nav .nav-btn {
+  background: #21262d; border: 1px solid #30363d; color: #8b949e; padding: 4px 10px;
+  border-radius: 4px; cursor: pointer; font-size: 12px; transition: all 0.2s;
+}
+.date-nav .nav-btn:hover:not(:disabled) { background: #30363d; color: #e6edf3; }
+.date-nav .nav-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+header .cta-hint {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 100%);
+  border: 1px solid #3b82f6;
+  border-radius: 6px;
+  padding: 8px 12px;
+  color: #60a5fa;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+  min-width: 180px;
+}
+header .cta-hint:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #4338ca 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3);
+}
+header .date-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 8px;
+  position: relative;
+  flex-wrap: wrap;
+}
+header .date-nav .nav-btn {
+  background: #21262d;
+  border: 1px solid #30363d;
+  color: #8b949e;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+header .date-nav .nav-btn:hover { background: #30363d; color: #e6edf3; }
+header .date-nav .nav-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+header .date-nav .date { color: #58a6ff; font-size: 15px; font-weight: 600; }
+header .date-nav .update-time { position: absolute; right: 12px; font-size: 11px; color: #6e7681; }
+
+.section-title { font-size: 16px; margin: 16px 0 10px; padding-left: 8px; border-left: 3px solid #f85149; }
+
+.concept-section { margin-bottom: 20px; }
+.concept-title {
+  font-size: 14px;
+  margin: 12px 0 8px;
+  padding: 8px 12px;
+  background: #21262d;
+  border-radius: 6px;
+  border-left: 3px solid #58a6ff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.concept-title .icon { font-size: 16px; }
+.concept-title .count {
+  color: #8b949e;
+  font-size: 12px;
+  margin-left: auto;
+}
+.concept-reason {
+  color: #8b949e;
+  font-size: 11px;
+  margin: 0 12px 8px 12px;
+  font-style: italic;
+}
+.stock-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.stock-grid.single { grid-template-columns: 1fr; gap: 4px; max-width: 280px; display: inline-grid; margin-right: 16px; vertical-align: top; }
+.singles-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.stock-card { background: #161b22; border: 1px solid #30363d; border-radius: 6px; transition: all 0.2s ease; position: relative; }
+.stock-card .reason-tip { display: none; position: absolute; left: 0; right: 0; bottom: 100%; background: #1c2129; border: 1px solid #444c56; border-radius: 6px; padding: 8px 10px; font-size: 12px; color: #c9d1d9; line-height: 1.5; z-index: 100; pointer-events: none; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+.stock-card .reason-tip .tip-cta { color: #58a6ff; font-size: 11px; margin-top: 4px; }
+.stock-card:hover .reason-tip { display: block; }
+.stock-card a { text-decoration: none; color: inherit; display: block; padding: 10px 12px; transition: all 0.2s ease; }
+.stock-card a:hover { background: #1c2129; }
+.stock-header { display: flex; justify-content: space-between; align-items: center; }
+.stock-name { font-size: 14px; font-weight: 600; }
+.stock-code { color: #8b949e; font-size: 12px; margin-left: 6px; }
+.stock-price { text-align: right; }
+.stock-close { font-size: 14px; font-weight: 600; }
+.stock-change { font-size: 11px; margin-top: 1px; }
+.up { color: #f85149; }
+.down { color: #3fb950; }
+.stock-meta { display: flex; justify-content: space-between; margin-top: 6px; font-size: 11px; color: #8b949e; }
+
+.content-wrapper {
+  margin-top: 20px;
+}
+
+/* Stock detail page */
+.back { display: inline-block; color: #58a6ff; text-decoration: none; margin-bottom: 16px; font-size: 14px; }
+.back:hover { text-decoration: underline; }
+.info-bar { display: flex; justify-content: space-between; align-items: center; background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 16px; margin-bottom: 20px; }
+.info-left h2 { font-size: 22px; }
+.info-left .code { color: #8b949e; font-size: 14px; }
+.info-right { text-align: right; }
+.info-right .price { font-size: 24px; font-weight: 700; }
+.info-right .change-info { font-size: 14px; margin-top: 4px; }
+.badge { display: inline-block; padding: 2px 10px; border-radius: 4px; font-size: 13px; font-weight: 600; }
+.badge.up { background: rgba(248,81,73,0.2); }
+.badge.down { background: rgba(63,185,80,0.2); }
+
+/* Side-by-side tables */
+.dual-panel { display: flex; gap: 16px; }
+.panel { flex: 1; min-width: 0; }
+.panel-title { text-align: center; padding: 8px; font-size: 13px; font-weight: 600; border-bottom: 2px solid #30363d; margin-bottom: 8px; }
+.panel-title.buy { border-bottom-color: #f85149; color: #f85149; }
+.panel-title.sell { border-bottom-color: #3fb950; color: #3fb950; }
+
+table { width: 100%; border-collapse: collapse; }
+th { text-align: right; padding: 3px 4px; font-size: 10px; color: #8b949e; border-bottom: 1px solid #30363d; white-space: nowrap; }
+th:first-child { text-align: left; }
+td { padding: 4px 4px; font-size: 11px; border-bottom: 1px solid #21262d; text-align: right; font-variant-numeric: tabular-nums; }
+td:first-child { text-align: left; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 65px; }
+tr:hover { background: #1c2129; }
+.net { font-weight: 600; }
+
+footer { text-align: center; padding: 32px 0 24px; color: #484f58; font-size: 12px; border-top: 1px solid #30363d; margin-top: 32px; }
+footer a { color: #58a6ff; text-decoration: none; }
+
+@media (max-width: 1000px) {
+}
+@media (max-width: 1200px) {
+  .stock-grid { grid-template-columns: repeat(3, 1fr); }
+  .stock-grid.single { max-width: 240px; }
+}
+@media (max-width: 900px) {
+  .stock-grid { grid-template-columns: repeat(2, 1fr); }
+  .stock-grid.single { max-width: 100%; margin-right: 0; margin-bottom: 8px; }
+  .singles-container { grid-template-columns: 1fr; }
+}
+@media (max-width: 700px) {
+  .container { padding: 4px; }
+  .stock-grid { grid-template-columns: repeat(2, 1fr); gap: 4px; }
+  .info-bar { flex-direction: column; text-align: center; gap: 12px; }
+  .info-right { text-align: center; }
+  .dual-panel { gap: 4px; }
+  th { padding: 2px 2px; font-size: 9px; }
+  td { padding: 3px 2px; font-size: 9px; }
+  td:first-child { max-width: 52px; font-size: 9px; }
+  .panel-title { font-size: 11px; padding: 6px; }
+  header .date-nav .nav-btn { padding: 3px 8px; font-size: 10px; }
+  header .date-nav .date { font-size: 13px; }
+  header .date-nav .update-time { position: static; display: block; width: 100%; text-align: center; margin-top: 4px; font-size: 10px; }
+  header .cta-hint { position: static; margin: 8px auto 0; min-width: auto; width: fit-content; font-size: 10px; padding: 6px 10px; }
+}
+</style>
 </head>
 <body>
+<nav style="background:#0a0a16;border-bottom:1px solid #30363d;padding:6px 8px;display:flex;align-items:center;justify-content:center;gap:6px;position:sticky;top:0;z-index:999;">
+  <a href="index-20260323.html" style="padding:4px 10px;border-radius:16px;font-size:11px;font-weight:600;text-decoration:none;background:#1a6bc4;color:#fff;">漲停族群AI分類</a>
+  <a href="nextday-performance-20260323.html" style="padding:4px 10px;border-radius:16px;font-size:11px;font-weight:600;text-decoration:none;color:#888;background:#1a1a2e;">漲停隔日</a>
+  <a href="stats.html" style="padding:4px 10px;border-radius:16px;font-size:11px;font-weight:600;text-decoration:none;color:#888;background:#1a1a2e;">漲停統計</a>
+  <a href="disposal-forecast-20260323.html" style="padding:4px 10px;border-radius:16px;font-size:11px;font-weight:600;text-decoration:none;color:#888;background:#1a1a2e;">處置標準</a>
+  <input id="stock-search" type="text" inputmode="decimal" placeholder="🔍股號" style="width:72px;padding:4px 8px;border-radius:16px;border:1px solid #58a6ff;background:#0d1117;color:#e0e0e0;font-size:16px;outline:none;" />
+</nav>
+<div class="container">
+  <header>
+    <div class="cta-hint" onclick="scrollToStocks()">
+      💡 點股票看分點、主力泡泡圖
+    </div>
+    <h1><span class="rabbit">🐰</span> Chengwaye漲停族群AI分類</h1>
+    <div class="subtitle">AI 分類族群 • 智能解析漲停原因 • 一鍵視覺化主力買賣</div>
+    <div class="date-nav">
+      <button class="nav-btn" onclick="navigateDate('20260323', -1)" >◀ 前一天</button>
+      <div class="date">2026/03/23</div>
+      <button class="nav-btn" onclick="navigateDate('20260323', 1)" disabled>後一天 ▶</button>
+      <span class="update-time">每日 16:30 更新</span>
+    </div>
+  </header>
 
-<!-- UI 顯示：分數與時間 -->
-<div id="ui-layer">
-    <div>得分: <span id="score">0</span></div>
-    <div>時間: <span id="time">60</span>s</div>
+  <div class="content-wrapper">
+    <div class="section-title" id="stocks-section">🔴 漲停 (25)</div>
+    
+    <div class="concept-section">
+      <div class="concept-title">
+        <span class="icon">🛢️</span>
+        <span>塑化化工</span>
+        <span class="count">6檔</span>
+      </div>
+      <div class="concept-reason">中東美伊衝突升溫，布蘭特原油飆破110美元，PE及化工原料急漲，台聚集團四寶齊攻漲停，成為大盤暴跌千點中唯一亮點</div>
+      <div class="stock-grid">
+        
+    <div class="stock-card" data-code="1304">
+      <div class="reason-tip">美伊衝突升溫致國際油價飆破100美元/桶，塑化上游原料單週報價漲逾三成，台聚為台聚集團旗下EVA/PE製造商，受惠原料報價飆漲帶動，3/23台股暴跌逾千點中逆勢漲停鎖死，成交量爆至近6萬張。台聚集團四寶（台聯、華夏、亞聚、台達化）同步攻頂，為典型油價驅動的塑化族群連動行情。<div class="tip-cta">點擊查看籌碼分析 ↓</div></div>
+      <a href="stock/20260323/1304.html">
+        <div class="stock-header">
+          <div><span class="stock-name">台聚</span><span class="stock-code">1304</span></div>
+          <div class="stock-price">
+            <div class="stock-close up">$16.55</div>
+            <div class="stock-change up">+1.5 (9.97%)</div>
+          </div>
+        </div>
+        <div class="stock-meta">
+          <span>成交量 59,484張</span>
+          <span class="badge up">漲停</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="stock-card" data-code="1305">
+      <div class="reason-tip">華夏為台聚集團成員，主營PVC塑膠布/管及鹼氯產品，受中東戰火引爆能源危機、布蘭特原油飆漲帶動塑化原料供給告急，報價大幅上揚。3/23台股重挫逾千點，塑化族群成避險資金湧入標的，華夏隨台聚集團四寶同步漲停。<div class="tip-cta">點擊查看籌碼分析 ↓</div></div>
+      <a href="stock/20260323/1305.html">
+        <div class="stock-header">
+          <div><span class="stock-name">華夏</span><span class="stock-code">1305</span></div>
+          <div class="stock-price">
+            <div class="stock-close up">$18.45</div>
+            <div class="stock-change up">+1.65 (9.82%)</div>
+          </div>
+        </div>
+        <div class="stock-meta">
+          <span>成交量 21,417張</span>
+          <span class="badge up">漲停</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="stock-card" data-code="1308">
+      <div class="reason-tip">亞聚為台聚集團旗下ABS/PE樹脂廠，受美伊衝突導致荷莫茲海峽封鎖風險升高、國際油價飆漲逾100美元，塑化上游原料短缺並大幅漲價。隨台聚集團塑化四寶齊攻漲停。<div class="tip-cta">點擊查看籌碼分析 ↓</div></div>
+      <a href="stock/20260323/1308.html">
+        <div class="stock-header">
+          <div><span class="stock-name">亞聚</span><span class="stock-code">1308</span></div>
+          <div class="stock-price">
+            <div class="stock-close up">$18.15</div>
+            <div class="stock-change up">+1.65 (10.00%)</div>
+          </div>
+        </div>
+        <div class="stock-meta">
+          <span>成交量 34,177張</span>
+          <span class="badge up">漲停</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="stock-card" data-code="1309">
+      <div class="reason-tip">台達化為台聚集團旗下苯乙烯/PS製造商，本波受中東地緣政治持續升溫、油價維持百元以上高檔，塑化鏈供給告急喊漲，資金持續追捧二線塑化股，再度隨族群連動漲停。<div class="tip-cta">點擊查看籌碼分析 ↓</div></div>
+      <a href="stock/20260323/1309.html">
+        <div class="stock-header">
+          <div><span class="stock-name">台達化</span><span class="stock-code">1309</span></div>
+          <div class="stock-price">
+            <div class="stock-close up">$19.9</div>
+            <div class="stock-change up">+1.8 (9.94%)</div>
+          </div>
+        </div>
+        <div class="stock-meta">
+          <span>成交量 10,004張</span>
+          <span class="badge up">漲停</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="stock-card" data-code="3684">
+      <div class="reason-tip">榮昌為特用化學品廠，中東衝突推升化工原料行情，跟隨塑化化工族群走強，原物料漲價題材發酵。<div class="tip-cta">點擊查看籌碼分析 ↓</div></div>
+      <a href="stock/20260323/3684.html">
+        <div class="stock-header">
+          <div><span class="stock-name">榮昌</span><span class="stock-code">3684</span></div>
+          <div class="stock-price">
+            <div class="stock-close up">$65.3</div>
+            <div class="stock-change up">+5.9 (9.93%)</div>
+          </div>
+        </div>
+        <div class="stock-meta">
+          <span>成交量 507張</span>
+          <span class="badge up">漲停</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="stock-card" data-code="6585">
+      <div class="reason-tip">鼎基為高機能TPU薄膜製造商，車用漆面保護膜與醫療為雙引擎，營收表現優於預期。屬塑化延伸的高值化材料概念，隨油價帶動塑化族群走強。<div class="tip-cta">點擊查看籌碼分析 ↓</div></div>
+      <a href="stock/20260323/6585.html">
+        <div class="stock-header">
+          <div><span class="stock-name">鼎基</span><span class="stock-code">6585</span></div>
+          <div class="stock-price">
+            <div class="stock-close up">$90.5</div>
+            <div class="stock-change up">+8.2 (9.96%)</div>
+          </div>
+        </div>
+        <div class="stock-meta">
+          <span>成交量 339張</span>
+          <span class="badge up">漲停</span>
+        </div>
+      </a>
+    </div>
+      </div>
+    </div>
+  
+
+    <div class="concept-section">
+      <div class="concept-title">
+        <span class="icon">🔥</span>
+        <span>天然氣能源</span>
+        <span class="count">2檔</span>
+      </div>
+      <div class="concept-reason">伊朗最大天然氣田遭襲起火，天然氣供給中斷疑慮推升油氣價格，燃氣配送股成避險資金首選</div>
+      <div class="stock-grid">
+        
+    <div class="stock-card" data-code="9918">
+      <div class="reason-tip">欣天然主營導管輸送天然氣供應民生用燃料，美伊衝突持續升溫致天然氣價格飆漲，台股暴跌中燃氣族群成避險資金首選，逆勢漲停。<div class="tip-cta">點擊查看籌碼分析 ↓</div></div>
+      <a href="stock/20260323/9918.html">
+        <div class="stock-header">
+          <div><span class="stock-name">欣天然</span><span class="stock-code">9918</span></div>
+          <div class="stock-price">
+            <div class="stock-close up">$51.3</div>
+            <div class="stock-change up">+4.6 (9.85%)</div>
+          </div>
+        </div>
+        <div class="stock-meta">
+          <span>成交量 1,717張</span>
+          <span class="badge up">漲停</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="stock-card" data-code="9931">
+      <div class="reason-tip">欣高為天然氣導管輸送業者，受中東局勢緊張推升國際油氣價格，2月營收年增8.35%，營運穩健搭配能源題材持續發酵。<div class="tip-cta">點擊查看籌碼分析 ↓</div></div>
+      <a href="stock/20260323/9931.html">
+        <div class="stock-header">
+          <div><span class="stock-name">欣高</span><span class="stock-code">9931</span></div>
+          <div class="stock-price">
+            <div class="stock-close up">$43.1</div>
+            <div class="stock-change up">+3.9 (9.95%)</div>
+          </div>
+        </div>
+        <div class="stock-meta">
+          <span>成交量 1,796張</span>
+          <span class="badge up">漲停</span>
+        </div>
+      </a>
+    </div>
+      </div>
+    </div>
+  
+
+    <div class="concept-section">
+      <div class="concept-title">
+        <span class="icon">🔗</span>
+        <span>光通訊</span>
+        <span class="count">6檔</span>
+      </div>
+      <div class="concept-reason">2026矽光子商轉元年，台積電COUPE技術領軍，OFC展會後CPO概念持續發酵</div>
+      <div class="stock-grid">
+        
+    <div class="stock-card" data-code="4903">
+      <div class="reason-tip">聯光通為光通訊元件廠，2026矽光子商轉元年帶動光通訊族群全面輪動，CPO概念股持續受到市場追捧。<div class="tip-cta">點擊查看籌碼分析 ↓</div></div>
+      <a href="stock/20260323/4903.html">
+        <div class="stock-header">
+          <div><span class="stock-name">聯光通</span><span class="stock-code">4903</span></div>
+          <div class="stock-price">
+            <div class="stock-close up">$50</div>
+            <div class="stock-change up">+4.5 (9.89%)</div>
+          </div>
+        </div>
+        <div class="stock-meta">
+          <span>成交量 28,454張</span>
+          <span class="badge up">漲停</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="stock-card" data-code="4905">
+      <div class="reason-tip">台聯電為光纖寬頻營運商，CPO概念延燒帶動光通訊族群全面走強，受惠矽光子商轉趨勢。<div class="tip-cta">點擊查看籌碼分析 ↓</div></div>
+      <a href="stock/20260323/4905.html">
+        <div class="stock-header">
+          <div><span class="stock-name">台聯電</span><span class="stock-code">4905</span></div>
+          <div class="stock-price">
+            <div class="stock-close up">$98.2</div>
+            <div class="stock-change up">+8.9 (9.97%)</div>
+          </div>
+        </div>
+        <div class="stock-meta">
+          <span>成交量 153張</span>
+          <span class="badge up">漲停</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="stock-card" data-code="5291">
+      <div class="reason-tip">邑昇為光纖連接元件廠，矽光子與CPO概念受惠股，光通訊族群輪動帶動。<div class="tip-cta">點擊查看籌碼分析 ↓</div></div>
+      <a href="stock/20260323/5291.html">
+        <div class="stock-header">
+          <div><span class="stock-name">邑昇</span><span class="stock-code">5291</span></div>
+          <div class="stock-price">
+            <div class="stock-close up">$68.5</div>
+            <div class="stock-change up">+6.2 (9.95%)</div>
+          </div>
+        </div>
+        <div class="stock-meta">
+          <span>成交量 6,294張</span>
+          <span class="badge up">漲停</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="stock-card" data-code="6530">
+      <div class="reason-tip">創威為光收發模組廠，CPO商轉推升光通訊零組件需求，矽光子元年直接受惠。<div class="tip-cta">點擊查看籌碼分析 ↓</div></div>
+      <a href="stock/20260323/6530.html">
+        <div class="stock-header">
+          <div><span class="stock-name">創威</span><span class="stock-code">6530</span></div>
+          <div class="stock-price">
+            <div class="stock-close up">$97.5</div>
+            <div class="stock-change up">+8.8 (9.92%)</div>
+          </div>
+        </div>
+        <div class="stock-meta">
+          <span>成交量 18,470張</span>
+          <span class="badge up">漲停</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="stock-card" data-code="6725">
+      <div class="reason-tip">矽科宏晟為矽光子概念股，2026矽光子商轉元年直接受惠，CPO加速商轉帶動。<div class="tip-cta">點擊查看籌碼分析 ↓</div></div>
+      <a href="stock/20260323/6725.html">
+        <div class="stock-header">
+          <div><span class="stock-name">矽科宏晟</span><span class="stock-code">6725</span></div>
+          <div class="stock-price">
+            <div class="stock-close up">$255.5</div>
+            <div class="stock-change up">+23 (9.89%)</div>
+          </div>
+        </div>
+        <div class="stock-meta">
+          <span>成交量 406張</span>
+          <span class="badge up">漲停</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="stock-card" data-code="7728">
+      <div class="reason-tip">光焱科技為光學檢測設備廠，矽光子製程檢測需求大增，OFC展會後光通訊族群強勢延續。<div class="tip-cta">點擊查看籌碼分析 ↓</div></div>
+      <a href="stock/20260323/7728.html">
+        <div class="stock-header">
+          <div><span class="stock-name">光焱科技</span><span class="stock-code">7728</span></div>
+          <div class="stock-price">
+            <div class="stock-close up">$891</div>
+            <div class="stock-change up">+81 (10.00%)</div>
+          </div>
+        </div>
+        <div class="stock-meta">
+          <span>成交量 1,031張</span>
+          <span class="badge up">漲停</span>
+        </div>
+      </a>
+    </div>
+      </div>
+    </div>
+  
+
+    <div class="concept-section">
+      <div class="concept-title">
+        <span class="icon">⚙️</span>
+        <span>半導體設備</span>
+        <span class="count">4檔</span>
+      </div>
+      <div class="concept-reason">CoWoS先進封裝需求強勁，台積電擴產計畫帶動設備及上游供應鏈</div>
+      <div class="stock-grid">
+        
+    <div class="stock-card" data-code="6207">
+      <div class="reason-tip">雷科為半導體設備廠，提供CoWoS先進封裝測試設備，已獲台灣封測大廠及全球領先晶圓代工廠認證採用。<div class="tip-cta">點擊查看籌碼分析 ↓</div></div>
+      <a href="stock/20260323/6207.html">
+        <div class="stock-header">
+          <div><span class="stock-name">雷科</span><span class="stock-code">6207</span></div>
+          <div class="stock-price">
+            <div class="stock-close up">$54.7</div>
+            <div class="stock-change up">+4.9 (9.84%)</div>
+          </div>
+        </div>
+        <div class="stock-meta">
+          <span>成交量 4,137張</span>
+          <span class="badge up">漲停</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="stock-card" data-code="7810">
+      <div class="reason-tip">捷創科技為台積電供應鏈設備廠，先進製程擴產帶動半導體設備需求持續成長。<div class="tip-cta">點擊查看籌碼分析 ↓</div></div>
+      <a href="stock/20260323/7810.html">
+        <div class="stock-header">
+          <div><span class="stock-name">捷創科技</span><span class="stock-code">7810</span></div>
+          <div class="stock-price">
+            <div class="stock-close up">$245.5</div>
+            <div class="stock-change up">+22 (9.84%)</div>
+          </div>
+        </div>
+        <div class="stock-meta">
+          <span>成交量 524張</span>
+          <span class="badge up">漲停</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="stock-card" data-code="8027">
+      <div class="reason-tip">鈦昇為半導體自動化設備廠，先進封裝需求旺盛帶動訂單成長，1月營收年增43%。<div class="tip-cta">點擊查看籌碼分析 ↓</div></div>
+      <a href="stock/20260323/8027.html">
+        <div class="stock-header">
+          <div><span class="stock-name">鈦昇</span><span class="stock-code">8027</span></div>
+          <div class="stock-price">
+            <div class="stock-close up">$117</div>
+            <div class="stock-change up">+10.5 (9.86%)</div>
+          </div>
+        </div>
+        <div class="stock-meta">
+          <span>成交量 9,356張</span>
+          <span class="badge up">漲停</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="stock-card" data-code="8064">
+      <div class="reason-tip">東捷為半導體設備廠，台積電擴產計畫帶動設備供應鏈全面受惠。<div class="tip-cta">點擊查看籌碼分析 ↓</div></div>
+      <a href="stock/20260323/8064.html">
+        <div class="stock-header">
+          <div><span class="stock-name">東捷</span><span class="stock-code">8064</span></div>
+          <div class="stock-price">
+            <div class="stock-close up">$70.8</div>
+            <div class="stock-change up">+6.4 (9.94%)</div>
+          </div>
+        </div>
+        <div class="stock-meta">
+          <span>成交量 16,453張</span>
+          <span class="badge up">漲停</span>
+        </div>
+      </a>
+    </div>
+      </div>
+    </div>
+  
+
+    <div class="concept-section">
+      <div class="concept-title">
+        <span class="icon">🖥️</span>
+        <span>AI伺服器</span>
+        <span class="count">3檔</span>
+      </div>
+      <div class="concept-reason">NVIDIA GTC大會點名台廠盟友，AI伺服器與邊緣運算需求持續擴張</div>
+      <div class="stock-grid">
+        
+    <div class="stock-card" data-code="3259">
+      <div class="reason-tip">鑫創為多媒體控制IC設計廠，AI邊緣運算應用拓展帶動相關IC需求成長，小型股籌碼集中逆勢走強。<div class="tip-cta">點擊查看籌碼分析 ↓</div></div>
+      <a href="stock/20260323/3259.html">
+        <div class="stock-header">
+          <div><span class="stock-name">鑫創</span><span class="stock-code">3259</span></div>
+          <div class="stock-price">
+            <div class="stock-close up">$20.1</div>
+            <div class="stock-change up">+1.8 (9.84%)</div>
+          </div>
+        </div>
+        <div class="stock-meta">
+          <span>成交量 575張</span>
+          <span class="badge up">漲停</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="stock-card" data-code="6482">
+      <div class="reason-tip">弘煜科為工業電腦廠，邊緣運算與AI應用需求持續擴張，帶動工業電腦訂單成長。<div class="tip-cta">點擊查看籌碼分析 ↓</div></div>
+      <a href="stock/20260323/6482.html">
+        <div class="stock-header">
+          <div><span class="stock-name">弘煜科</span><span class="stock-code">6482</span></div>
+          <div class="stock-price">
+            <div class="stock-close up">$35</div>
+            <div class="stock-change up">+3.15 (9.89%)</div>
+          </div>
+        </div>
+        <div class="stock-meta">
+          <span>成交量 135張</span>
+          <span class="badge up">漲停</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="stock-card" data-code="7711">
+      <div class="reason-tip">永擎為華擎子公司，專攻AI伺服器，AI營收占比突破八成。3/18輝達GTC大會黃仁勳點名永擎為15家台廠盟友之一，公司同日宣布庫藏股，雙重利多驅動連續漲停。<div class="tip-cta">點擊查看籌碼分析 ↓</div></div>
+      <a href="stock/20260323/7711.html">
+        <div class="stock-header">
+          <div><span class="stock-name">永擎</span><span class="stock-code">7711</span></div>
+          <div class="stock-price">
+            <div class="stock-close up">$288.5</div>
+            <div class="stock-change up">+26 (9.90%)</div>
+          </div>
+        </div>
+        <div class="stock-meta">
+          <span>成交量 2,381張</span>
+          <span class="badge up">漲停</span>
+        </div>
+      </a>
+    </div>
+      </div>
+    </div>
+  
+    <div class="concept-section">
+      <div class="concept-title">
+        <span class="icon">💼</span>
+        <span>個股表現亮點</span>
+        <span class="count">4檔</span>
+      </div>
+      <div class="concept-reason">各股基本面或技術面利多，展現獨立行情</div>
+      <div class="singles-container">
+        
+        <div class="concept-section" style="margin-bottom: 12px;">
+          <div class="concept-title" style="margin: 8px 0 4px; font-size: 12px; padding: 6px 8px;">
+            <span class="icon" style="font-size: 14px;">🔩</span>
+            <span style="font-size: 11px;">鋼鐵</span>
+          </div>
+          <div class="concept-reason" style="margin: 0 8px 4px; font-size: 10px;">國際原物料價格全面上揚，鎳鉻等不鏽鋼原料隨油價連動走升</div>
+          <div class="stock-grid single">
+            
+    <div class="stock-card" data-code="2025">
+      <div class="reason-tip">千興為不鏽鋼捲製造商，受國際原物料價格全面上揚帶動，鎳、鉻等不鏽鋼原料隨油價連動走升，加上2月營收年增67.25%顯示基本面好轉。在台股暴跌中，原物料概念股成為資金避風港。<div class="tip-cta">點擊查看籌碼分析 ↓</div></div>
+      <a href="stock/20260323/2025.html">
+        <div class="stock-header">
+          <div><span class="stock-name">千興</span><span class="stock-code">2025</span></div>
+          <div class="stock-price">
+            <div class="stock-close up">$12.75</div>
+            <div class="stock-change up">+1.15 (9.91%)</div>
+          </div>
+        </div>
+        <div class="stock-meta">
+          <span>成交量 1,474張</span>
+          <span class="badge up">漲停</span>
+        </div>
+      </a>
+    </div>
+          </div>
+        </div>
+        
+
+        <div class="concept-section" style="margin-bottom: 12px;">
+          <div class="concept-title" style="margin: 8px 0 4px; font-size: 12px; padding: 6px 8px;">
+            <span class="icon" style="font-size: 14px;">🎯</span>
+            <span style="font-size: 11px;">軍工</span>
+          </div>
+          <div class="concept-reason" style="margin: 0 8px 4px; font-size: 10px;">切入無人機反制系統搭上軍工概念，庫藏股計畫加持</div>
+          <div class="stock-grid single">
+            
+    <div class="stock-card" data-code="2231">
+      <div class="reason-tip">為升為汽車內裝開關製造龍頭，公司啟動庫藏股計畫，法人連日大舉買超，近年切入無人機反制系統搭上軍工概念，多重題材疊加推升漲停。<div class="tip-cta">點擊查看籌碼分析 ↓</div></div>
+      <a href="stock/20260323/2231.html">
+        <div class="stock-header">
+          <div><span class="stock-name">為升</span><span class="stock-code">2231</span></div>
+          <div class="stock-price">
+            <div class="stock-close up">$90.4</div>
+            <div class="stock-change up">+8.2 (9.98%)</div>
+          </div>
+        </div>
+        <div class="stock-meta">
+          <span>成交量 992張</span>
+          <span class="badge up">漲停</span>
+        </div>
+      </a>
+    </div>
+          </div>
+        </div>
+        
+
+        <div class="concept-section" style="margin-bottom: 12px;">
+          <div class="concept-title" style="margin: 8px 0 4px; font-size: 12px; padding: 6px 8px;">
+            <span class="icon" style="font-size: 14px;">📟</span>
+            <span style="font-size: 11px;">PCB</span>
+          </div>
+          <div class="concept-reason" style="margin: 0 8px 4px; font-size: 10px;">PCB印刷電路板製造加工，籌碼集中小型股逆勢走強</div>
+          <div class="stock-grid single">
+            
+    <div class="stock-card" data-code="3229">
+      <div class="reason-tip">晟鈦主營PCB印刷電路板製造加工及磷銅球貿易，近期連續漲停，成交量小屬籌碼集中型小型股，在大盤暴跌環境下成投機資金標的。<div class="tip-cta">點擊查看籌碼分析 ↓</div></div>
+      <a href="stock/20260323/3229.html">
+        <div class="stock-header">
+          <div><span class="stock-name">晟鈦</span><span class="stock-code">3229</span></div>
+          <div class="stock-price">
+            <div class="stock-close up">$21.45</div>
+            <div class="stock-change up">+1.95 (10.00%)</div>
+          </div>
+        </div>
+        <div class="stock-meta">
+          <span>成交量 573張</span>
+          <span class="badge up">漲停</span>
+        </div>
+      </a>
+    </div>
+          </div>
+        </div>
+        
+
+        <div class="concept-section" style="margin-bottom: 12px;">
+          <div class="concept-title" style="margin: 8px 0 4px; font-size: 12px; padding: 6px 8px;">
+            <span class="icon" style="font-size: 14px;">💊</span>
+            <span style="font-size: 11px;">生技醫療</span>
+          </div>
+          <div class="concept-reason" style="margin: 0 8px 4px; font-size: 10px;">高端疫苗腸病毒71型疫苗取得越南藥證，海外市場突破性進展</div>
+          <div class="stock-grid single">
+            
+    <div class="stock-card" data-code="6547">
+      <div class="reason-tip">高端疫苗自主研發腸病毒71型疫苗取得越南藥證，海外市場突破性進展，連續強勢漲停。<div class="tip-cta">點擊查看籌碼分析 ↓</div></div>
+      <a href="stock/20260323/6547.html">
+        <div class="stock-header">
+          <div><span class="stock-name">高端疫苗</span><span class="stock-code">6547</span></div>
+          <div class="stock-price">
+            <div class="stock-close up">$54.5</div>
+            <div class="stock-change up">+4.9 (9.88%)</div>
+          </div>
+        </div>
+        <div class="stock-meta">
+          <span>成交量 15,633張</span>
+          <span class="badge up">漲停</span>
+        </div>
+      </a>
+    </div>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  
+  </div>
+
+  <!-- AI 分析聲明 -->
+  <div style="background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 8px; margin: 20px 0; text-align: center; max-width: 100%; box-sizing: border-box;">
+    <div style="color: #484f58; font-size: 9px; line-height: 1.4; word-break: break-all;">
+      🤖 漲停原因與族群分類由 AI 自動分析產生，僅供參考，不代表投資建議
+    </div>
+  </div>
+
+  <footer>
+    <p>資料來源：臺灣證券交易所 / 證券櫃檯買賣中心</p>
+    <p style="color:#e74c3c">本站資訊僅供參考，不構成任何投資建議。投資人應獨立判斷，審慎評估並自負盈虧。</p>
+    <p>🐰 Chengwaye &copy; 2026 | 每個交易日 16:30 自動更新</p>
+  </footer>
 </div>
 
-<canvas id="gameCanvas"></canvas>
-
 <script>
-    // --- 遊戲設定與變數 ---
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
-    const scoreEl = document.getElementById('score');
-    const timeEl = document.getElementById('time');
+// 滾動到股票區
+function scrollToStocks() {
+  document.getElementById('stocks-section').scrollIntoView({
+    behavior: 'smooth',
+    block: 'start'
+  });
+}
 
-    let score = 0;
-    let isGameOver = false;
-    let isTimeUp = false; // 新增：是否因為時間到而結束
-    let animationId;
-    let frameCount = 0;
-    
-    // 時間設定
-    const GAME_DURATION = 60;
-    let timeLeft = GAME_DURATION;
-    let timerInterval = null;
+// 日期導航功能
+function navigateDate(direction) {
+  const currentDateStr = '20260323'; // YYYYMMDD format
+  const currentDate = new Date(
+    parseInt(currentDateStr.substring(0, 4)),
+    parseInt(currentDateStr.substring(4, 6)) - 1,
+    parseInt(currentDateStr.substring(6, 8))
+  );
 
-    // 遊戲物件陣列
-    let items = [];
-    let particles = [];
-    let bgDecorations = [];
+  // 計算新日期
+  const newDate = new Date(currentDate);
+  newDate.setDate(newDate.getDate() + direction);
 
-    // 玩家設定 (聚寶盆)
-    const player = {
-        x: 0,
-        y: 0,
-        width: 100,
-        height: 60,
-        speed: 25, // 速度提升 (15 -> 25) 以應對高難度
-        color: '#FFD700',
-        isMovingLeft: false,
-        isMovingRight: false
-    };
+  // 格式化為 YYYYMMDD
+  const year = newDate.getFullYear();
+  const month = String(newDate.getMonth() + 1).padStart(2, '0');
+  const day = String(newDate.getDate()).padStart(2, '0');
+  const newDateStr = year + month + day;
 
-    // 掉落物類型定義
-    const ITEM_TYPES = {
-        RED_PACKET: { emoji: '🧧', score: 10, weight: 60, speedBase: 5, type: 'good' }, // 基礎速度 3 -> 5
-        INGOT: { emoji: '💰', score: 50, weight: 20, speedBase: 8, type: 'good' }, // 基礎速度 5 -> 8
-        BOMB: { emoji: '💣', score: 0, weight: 15, speedBase: 7, type: 'bad' }, // 基礎速度 4 -> 7
-        FIRECRACKER: { emoji: '🧨', score: 0, weight: 5, speedBase: 10, type: 'bad' } // 基礎速度 6 -> 10
-    };
+  // 構造新的 URL (假設未來會有其他日期的頁面)
+  const newUrl = window.location.pathname.replace(/\/[^/]*$/, '') + '/' + newDateStr + '.html';
 
-    // --- 初始化與事件監聽 ---
+  // 目前先顯示提示，未來有多日數據時可以直接跳轉
+  alert('🚧 歷史數據功能開發中\n將來會支援查看 ' + year + '/' + month + '/' + day + ' 的漲停數據');
 
-    function resize() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        player.y = canvas.height - player.height - 20;
-        if (player.x > canvas.width - player.width) player.x = canvas.width - player.width;
-        initBgDecorations();
-    }
+  // 未來啟用:
+  // window.location.href = newUrl;
+}
 
-    window.addEventListener('resize', resize);
-    window.addEventListener('load', () => {
-        resize();
-        player.x = canvas.width / 2 - player.width / 2;
-        initGame();
-        loop();
+// 股票卡片點擊提示動畫
+document.addEventListener('DOMContentLoaded', function() {
+  const stockCards = document.querySelectorAll('.stock-card a');
+  stockCards.forEach(card => {
+    card.addEventListener('mouseenter', function() {
+      this.style.transform = 'translateY(-1px)';
+      this.style.boxShadow = '0 4px 12px rgba(88, 166, 255, 0.15)';
     });
-
-    window.addEventListener('keydown', (e) => {
-        if (isGameOver && e.code === 'Space') {
-            restartGame();
-            return;
-        }
-        if (e.key === 'ArrowLeft') player.isMovingLeft = true;
-        if (e.key === 'ArrowRight') player.isMovingRight = true;
+    card.addEventListener('mouseleave', function() {
+      this.style.transform = 'translateY(0)';
+      this.style.boxShadow = 'none';
     });
+  });
 
-    window.addEventListener('keyup', (e) => {
-        if (e.key === 'ArrowLeft') player.isMovingLeft = false;
-        if (e.key === 'ArrowRight') player.isMovingRight = false;
-    });
+  // Date navigation
+  window.navigateDate = function(currentDate, direction) {
+    const availableDates = ["20260323","20260320","20260319","20260318","20260317"];
+    const currentIndex = availableDates.indexOf(currentDate);
 
-    function movePlayerTo(clientX) {
-        if (isGameOver) return;
-        let newX = clientX - player.width / 2;
-        if (newX < 0) newX = 0;
-        if (newX > canvas.width - player.width) newX = canvas.width - player.width;
-        player.x = newX;
+    let targetDate;
+    if (direction === -1 && currentIndex < availableDates.length - 1) {
+      // 前一天：往陣列後面（更舊的日期）
+      targetDate = availableDates[currentIndex + 1];
+    } else if (direction === 1 && currentIndex > 0) {
+      // 後一天：往陣列前面（更新的日期）
+      targetDate = availableDates[currentIndex - 1];
     }
 
-    canvas.addEventListener('mousemove', (e) => {
-        movePlayerTo(e.clientX);
-    });
-
-    canvas.addEventListener('touchmove', (e) => {
-        e.preventDefault();
-        movePlayerTo(e.touches[0].clientX);
-    }, { passive: false });
-
-    canvas.addEventListener('click', () => {
-        if (isGameOver) {
-            restartGame();
-        }
-    });
-
-    // --- 遊戲邏輯 ---
-
-    function initGame() {
-        score = 0;
-        timeLeft = GAME_DURATION;
-        isGameOver = false;
-        isTimeUp = false;
-        items = [];
-        particles = [];
-        
-        scoreEl.innerText = score;
-        timeEl.innerText = timeLeft;
-        
-        player.x = canvas.width / 2 - player.width / 2;
-        
-        // 啟動倒數計時
-        if (timerInterval) clearInterval(timerInterval);
-        timerInterval = setInterval(() => {
-            if (!isGameOver) {
-                timeLeft--;
-                timeEl.innerText = timeLeft;
-                if (timeLeft <= 0) {
-                    gameCompleted(); // 時間到
-                }
-            }
-        }, 1000);
+    if (targetDate) {
+      if (targetDate === availableDates[0]) {
+        // Latest date -> index.html
+        window.location.href = 'index.html';
+      } else {
+        // Historical date -> index-YYYYMMDD.html
+        window.location.href = `index-${targetDate}.html`;
+      }
     }
+  };
+});
 
-    function initBgDecorations() {
-        bgDecorations = [];
-        const count = Math.floor(canvas.width / 150);
-        for (let i = 0; i < count; i++) {
-            bgDecorations.push({
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
-                size: 20 + Math.random() * 40,
-                text: Math.random() > 0.5 ? '🐎' : '✨',
-                opacity: 0.1 + Math.random() * 0.2
-            });
-        }
+// 搜尋股號
+(function(){
+  const si = document.getElementById('stock-search');
+  if (!si) return;
+  const missEl = document.createElement('div');
+  Object.assign(missEl.style, {
+    position:'fixed', top:'42px', right:'8px', background:'#e74c3c', color:'#fff',
+    padding:'4px 10px', borderRadius:'8px', fontSize:'11px', zIndex:'10000',
+    opacity:'0', transition:'opacity 0.3s', pointerEvents:'none'
+  });
+  missEl.textContent = '未在今日漲停';
+  document.body.appendChild(missEl);
+  si.addEventListener('click', () => { si.value = ''; si.style.borderColor = '#30363d'; });
+  const doSearch = () => {
+    const code = si.value.trim();
+    if (code.length < 4) return;
+    const card = document.querySelector('.stock-card[data-code="' + code + '"]');
+    document.querySelectorAll('.stock-card.search-hit').forEach(c => { c.style.outline = ''; c.classList.remove('search-hit'); });
+    if (card) {
+      si.style.borderColor = '#30363d';
+      missEl.style.opacity = '0';
+      card.classList.add('search-hit');
+      card.style.outline = '2px solid #1a6bc4';
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      si.blur();
+    } else {
+      si.style.borderColor = '#e74c3c';
+      missEl.style.opacity = '1';
+      setTimeout(() => { missEl.style.opacity = '0'; si.style.borderColor = '#30363d'; }, 1500);
     }
-
-    function restartGame() {
-        initGame();
-        loop();
-    }
-
-    function spawnItem() {
-        // --- 難度控制核心 ---
-        // 隨著時間流逝 (elapsedTime)，速度變得越來越快
-        const elapsedTime = GAME_DURATION - timeLeft;
-        
-        // 1. 生成頻率：時間越少，掉得越密
-        // 初始每 40 幀(約0.7秒)生成一次，最快每 6 幀(約0.1秒)生成一次 - 極速模式
-        const currentSpawnRate = Math.max(6, 40 - Math.floor(elapsedTime * 0.8));
-        
-        if (frameCount % currentSpawnRate === 0) {
-            const r = Math.random() * 100;
-            let selectedType = ITEM_TYPES.RED_PACKET;
-
-            // 炸彈機率隨分數和時間大幅增加 (上限提高到 45%)
-            let bombChanceAdd = Math.min(45, Math.floor(score / 50) + Math.floor(elapsedTime / 2)); 
-            
-            if (r < 60 - bombChanceAdd) selectedType = ITEM_TYPES.RED_PACKET;
-            else if (r < 80 - bombChanceAdd) selectedType = ITEM_TYPES.INGOT;
-            else selectedType = Math.random() > 0.5 ? ITEM_TYPES.BOMB : ITEM_TYPES.FIRECRACKER;
-
-            // 2. 掉落速度：隨時間顯著變快
-            // 起始 1.2 倍速，結束時接近 4.0 倍速 (原本是 2.5)
-            const timeSpeedMultiplier = 1.2 + (elapsedTime / GAME_DURATION) * 2.8;
-
-            const size = 40;
-            items.push({
-                x: Math.random() * (canvas.width - size),
-                y: -50,
-                size: size,
-                ...selectedType,
-                speed: selectedType.speedBase * timeSpeedMultiplier
-            });
-        }
-    }
-
-    function update() {
-        if (isGameOver) return;
-
-        // 玩家移動
-        if (player.isMovingLeft) {
-            player.x -= player.speed;
-            if (player.x < 0) player.x = 0;
-        }
-        if (player.isMovingRight) {
-            player.x += player.speed;
-            if (player.x > canvas.width - player.width) player.x = canvas.width - player.width;
-        }
-
-        // 更新掉落物
-        for (let i = items.length - 1; i >= 0; i--) {
-            let item = items[i];
-            item.y += item.speed;
-
-            if (
-                item.x < player.x + player.width &&
-                item.x + item.size > player.x &&
-                item.y < player.y + player.height &&
-                item.y + item.size > player.y + player.height * 0.2
-            ) {
-                if (item.type === 'good') {
-                    score += item.score;
-                    scoreEl.innerText = score;
-                    createParticle(item.x, item.y, `+${item.score}`, '#FFFF00');
-                    items.splice(i, 1);
-                } else {
-                    gameOver(); // 炸彈爆炸
-                }
-            } else if (item.y > canvas.height) {
-                items.splice(i, 1);
-            }
-        }
-
-        // 更新粒子
-        for (let i = particles.length - 1; i >= 0; i--) {
-            let p = particles[i];
-            p.y -= 1;
-            p.life--;
-            if (p.life <= 0) particles.splice(i, 1);
-        }
-
-        frameCount++;
-        spawnItem();
-    }
-
-    function createParticle(x, y, text, color) {
-        particles.push({
-            x: x,
-            y: y,
-            text: text,
-            color: color,
-            life: 40
-        });
-    }
-
-    // 時間到的結束 (Good Ending)
-    function gameCompleted() {
-        isGameOver = true;
-        isTimeUp = true;
-        clearInterval(timerInterval);
-        cancelAnimationFrame(animationId);
-        draw();
-    }
-
-    // 炸彈結束 (Bad Ending)
-    function gameOver() {
-        isGameOver = true;
-        isTimeUp = false;
-        clearInterval(timerInterval);
-        cancelAnimationFrame(animationId);
-        draw();
-    }
-
-    // --- 繪圖邏輯 ---
-
-    function draw() {
-        let gradient = ctx.createRadialGradient(canvas.width/2, canvas.height/2, 100, canvas.width/2, canvas.height/2, canvas.height);
-        gradient.addColorStop(0, '#B22222');
-        gradient.addColorStop(1, '#500000');
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        ctx.save();
-        bgDecorations.forEach(bg => {
-            ctx.globalAlpha = bg.opacity;
-            ctx.font = `${bg.size}px Arial`;
-            ctx.fillStyle = "#FFD700";
-            ctx.fillText(bg.text, bg.x, bg.y);
-        });
-        ctx.restore();
-
-        // 繪製掉落物 (修正: 增加顏色設定與字型，解決看不見的問題)
-        ctx.save();
-        ctx.fillStyle = "#FFFFFF"; // 強制設定為白色，避免被背景色吃掉
-        ctx.textBaseline = 'top'; // 改為上方對齊，讓位置更精確
-        items.forEach(item => {
-            // 使用多種 Emoji 字型以確保相容性
-            ctx.font = `${item.size}px "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", "Android Emoji", Arial, sans-serif`;
-            ctx.fillText(item.emoji, item.x, item.y);
-        });
-        ctx.restore();
-
-        drawPlayer();
-
-        particles.forEach(p => {
-            ctx.fillStyle = p.color;
-            ctx.font = "bold 24px Arial";
-            ctx.fillText(p.text, p.x, p.y);
-        });
-
-        if (isGameOver) {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            ctx.textAlign = 'center';
-            
-            if (isTimeUp) {
-                // 時間到的顯示
-                ctx.fillStyle = '#FFD700';
-                ctx.font = 'bold 50px Microsoft JhengHei';
-                ctx.fillText('🎊 恭喜發財 🎊', canvas.width / 2, canvas.height / 2 - 60);
-                
-                ctx.font = '30px Microsoft JhengHei';
-                ctx.fillStyle = '#FFFFFF';
-                ctx.fillText('時間結束！荷包滿滿！', canvas.width / 2, canvas.height / 2);
-            } else {
-                // 炸彈的顯示
-                ctx.fillStyle = '#FF4500'; // 橘紅色
-                ctx.font = 'bold 50px Microsoft JhengHei';
-                ctx.fillText('💥 歲歲平安 💥', canvas.width / 2, canvas.height / 2 - 60);
-                
-                ctx.font = '30px Microsoft JhengHei';
-                ctx.fillStyle = '#FFFFFF';
-                ctx.fillText('小心炸彈！下次再來！', canvas.width / 2, canvas.height / 2);
-            }
-            
-            ctx.font = '40px Microsoft JhengHei';
-            ctx.fillStyle = '#FFD700';
-            ctx.fillText(`最終得分: ${score}`, canvas.width / 2, canvas.height / 2 + 60);
-            
-            ctx.font = '24px Microsoft JhengHei';
-            ctx.fillStyle = '#AAAAAA';
-            ctx.fillText('點擊畫面重新開始', canvas.width / 2, canvas.height / 2 + 110);
-            
-            ctx.textAlign = 'start';
-        }
-    }
-
-    function drawPlayer() {
-        const p = player;
-        const x = p.x;
-        const y = p.y;
-        const w = p.width;
-        const h = p.height;
-
-        ctx.beginPath();
-        ctx.moveTo(x, y);
-        ctx.lineTo(x + w, y);
-        ctx.lineTo(x + w * 0.8, y + h);
-        ctx.lineTo(x + w * 0.2, y + h);
-        ctx.closePath();
-        
-        const goldGradient = ctx.createLinearGradient(x, y, x, y + h);
-        goldGradient.addColorStop(0, '#FFD700');
-        goldGradient.addColorStop(1, '#DAA520');
-        ctx.fillStyle = goldGradient;
-        ctx.fill();
-        
-        ctx.strokeStyle = '#B8860B';
-        ctx.lineWidth = 3;
-        ctx.stroke();
-
-        ctx.fillStyle = '#CC0000';
-        ctx.font = `bold ${h * 0.6}px Microsoft JhengHei`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('福', x + w / 2, y + h / 2 + 2);
-
-        ctx.textAlign = 'start';
-        ctx.textBaseline = 'alphabetic';
-    }
-
-    function loop() {
-        if (!isGameOver) {
-            update();
-            draw();
-            animationId = requestAnimationFrame(loop);
-        }
-    }
-
+  };
+  si.addEventListener('input', doSearch);
+  si.addEventListener('keyup', doSearch);
+  si.addEventListener('change', doSearch);
+})();
 </script>
-
 </body>
 </html>
